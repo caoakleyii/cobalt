@@ -1,0 +1,40 @@
+{
+    "sprites": {
+        "characters": {
+            "Skeleton": {
+                "name": "Skeleton",
+                "path": "skeleton/normal_white_sheet.png",
+                "width": 48.0,
+                "height": 48.0,
+                "columns": 8,
+                "rows": 11,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 0,
+                        "end_index": 7,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1
+                    },
+                    {
+                        "name":"Walk",
+                        "start_index": 8,
+                        "end_index": 15,
+                        "should_loop": true,
+                        "is_default": false,
+                        "frame_speed": 0.1
+                    },
+                    {
+                        "name":"Run",
+                        "start_index": 16,
+                        "end_index": 23,
+                        "should_loop": true,
+                        "is_default": false,
+                        "frame_speed": 0.1
+                    }
+                ]
+            }
+        }
+    }
+}

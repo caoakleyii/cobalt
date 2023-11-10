@@ -1,0 +1,64 @@
+use std::collections::HashMap;
+
+use bevy::{
+    prelude::{AssetServer, Assets, Commands, Handle, Image, NextState, Res, ResMut, Vec2},
+    sprite::TextureAtlas,
+};
+
+use crate::{
+    enums::GameState,
+    resources::{AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset},
+};
+
+pub fn asset_config_loader_sytem(asset_server: Res<AssetServer>, mut commands: Commands) {
+    // load assets into asset handler
+    let asset_config_handle: Handle<TextAsset> = asset_server.load("assets.json");
+
+    // store handlers into resource indvidually
+    commands.insert_resource(AssetConfigTextHandler {
+        handle: asset_config_handle,
+    });
+}
+
+pub fn asset_loader_system(
+    asset_config: Res<AssetConfigTextHandler>,
+    asset_server: Res<AssetServer>,
+    text_assets: Res<Assets<TextAsset>>,
+    mut state: ResMut<NextState<GameState>>,
+    mut commands: Commands,
+) {
+    if let Some(config_str) = text_assets.get(&asset_config.handle) {
+        let asset_config: AssetsConfig =
+            serde_json::from_str(&config_str.0).expect("Could not parse the asset config.");
+
+        let mut character_handles = HashMap::new();
+
+        asset_config
+            .sprites
+            .characters
+            .iter()
+            .for_each(|(key, char_config)| {
+                let image_handle: Handle<Image> = asset_server.load(char_config.path.clone());
+
+                let texture_atlas = TextureAtlas::from_grid(
+                    image_handle,
+                    Vec2::new(char_config.width, char_config.height),
+                    char_config.columns as usize,
+                    char_config.rows as usize,
+                    None,
+                    None,
+                );
+                character_handles
+                    .insert(key.clone(), (texture_atlas, char_config.animations.clone()));
+            });
+
+        let asset_handler = AssetHandler {
+            character_textures: character_handles,
+        };
+
+        commands.insert_resource(asset_handler);
+        commands.insert_resource(asset_config);
+
+        state.set(GameState::Gameloop);
+    }
+}

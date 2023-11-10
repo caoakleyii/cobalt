@@ -1,0 +1,131 @@
+use std::net::UdpSocket;
+use std::time::SystemTime;
+
+use bevy::prelude::*;
+use bevy_renet::{
+    renet::{
+        transport::{ClientAuthentication, NetcodeClientTransport, NetcodeTransportError},
+        RenetClient,
+    },
+    transport::{client_connected, NetcodeClientPlugin},
+    RenetClientPlugin,
+};
+
+use utils::{
+    enums::GameState,
+    events::{PlayerCreateEvent, PlayerRemoveEvent},
+    networking::{connection_config, PROTOCOL_ID},
+    resources::{
+        ClientLobby, Connected, CurrentClientId, NetworkEntities, PlayerInput, TextAsset,
+        TextLoader,
+    },
+    systems::{
+        animate_sprites, asset_config_loader_sytem, asset_loader_system,
+        capture_player_input_system, client_send_player_input_system, handle_input,
+        networking::client_update_system, player_create_system, player_remove_system,
+        sync_animation_state,
+    },
+};
+
+fn main() {
+    let mut app = App::new();
+
+    app.add_plugins((DefaultPlugins, RenetClientPlugin, NetcodeClientPlugin));
+
+    app.add_state::<GameState>();
+
+    register_client_asset_systems(&mut app);
+
+    connect_client_and_network_systems(&mut app);
+
+    register_network_events(&mut app);
+
+    reigster_game_systems(&mut app);
+
+    app.run();
+}
+
+fn register_client_asset_systems(app: &mut App) {
+    app.add_asset::<TextAsset>();
+    app.init_asset_loader::<TextLoader>();
+
+    app.add_systems(Startup, asset_config_loader_sytem);
+    app.add_systems(
+        Update,
+        asset_loader_system.run_if(in_state(GameState::Loading)),
+    );
+
+    app.add_systems(Update, animate_sprites);
+}
+
+/// Connnect to the server
+/// and add any required resources, and systems.
+fn connect_client_and_network_systems(app: &mut App) {
+    let client = RenetClient::new(connection_config());
+
+    let server_addr = "127.0.0.1:5000".parse().unwrap();
+    let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+    let current_time = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap();
+    let client_id = current_time.as_millis() as u64;
+    let authentication = ClientAuthentication::Unsecure {
+        client_id,
+        protocol_id: PROTOCOL_ID,
+        server_addr,
+        user_data: None,
+    };
+
+    let transport = NetcodeClientTransport::new(current_time, authentication, socket).unwrap();
+
+    app.configure_set(Update, Connected.run_if(client_connected()));
+    app.insert_resource(client);
+    app.insert_resource(transport);
+
+    app.insert_resource(ClientLobby::default());
+    app.insert_resource(CurrentClientId(client_id));
+    app.insert_resource(NetworkEntities::default());
+
+    // If any error is found we just panic
+    fn panic_on_error_system(mut renet_error: EventReader<NetcodeTransportError>) {
+        for e in renet_error.iter() {
+            panic!("{}", e);
+        }
+    }
+
+    app.add_systems(
+        Update,
+        panic_on_error_system.run_if(in_state(GameState::Gameloop)),
+    );
+    app.add_systems(
+        Update,
+        client_update_system.run_if(in_state(GameState::Gameloop)),
+    );
+}
+
+/// Network Systems and Events once the client is connected
+fn register_network_events(app: &mut App) {
+    app.add_event::<PlayerCreateEvent>();
+    app.add_event::<PlayerRemoveEvent>();
+
+    app.add_systems(
+        Update,
+        (player_create_system, player_remove_system).in_set(Connected),
+    );
+}
+
+/// Game Loop Systems outside of network
+fn reigster_game_systems(app: &mut App) {
+    app.insert_resource(PlayerInput::default());
+
+    app.add_systems(
+        Update,
+        (
+            capture_player_input_system,
+            client_send_player_input_system,
+            handle_input,
+            sync_animation_state,
+        )
+            .in_set(Connected),
+    );
+}
