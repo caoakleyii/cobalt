@@ -14,7 +14,7 @@ pub struct Speed(pub f32);
 
 impl Default for Speed {
     fn default() -> Self {
-        Self(1.0)
+        Self(100.0)
     }
 }
 

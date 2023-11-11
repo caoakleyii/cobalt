@@ -36,5 +36,50 @@
                 ]
             }
         }
+    },
+    "stats": {
+        "equipment": {
+            "Rifle": {
+                "name": "Rifle",
+                "magazine": 27,
+                "max_magazine": 27,
+                "fire_rate": 0.2,
+                "reload_time": 1.0,
+                "damage": 10,
+                "spray": 0.3,
+                "projectile_speed": 10.0,
+                "projectile_size": 1.0,
+                "projectile_per_shot": 1,
+                "range": 1000
+            },
+            "Smg": {
+                "name": "Smg",
+                "magazine": 21,
+                "max_magazine": 21,
+                "fire_rate": 0.1,
+                "reload_time": 0.6,
+                "damage": 2,
+                "spray": 0.5,
+                "projectile_speed": 10.0,
+                "projectile_size": 1.0,
+                "projectile_per_shot": 1,
+                "range": 500
+            },
+            "Shotgun":{
+                "name": "Shotgun",
+                "magazine": 8,
+                "max_magazine": 8,
+                "fire_rate": 0.5,
+                "reload_time": 1.0,
+                "damage": 10,
+                "spray": 0.8,
+                "projectile_speed": 10.0,
+                "projectile_size": 1.0,
+                "projectile_per_shot": 5,
+                "range": 500
+            }
+    
+        }
     }
+    
 }

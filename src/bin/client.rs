@@ -13,7 +13,7 @@ use bevy_renet::{
 
 use utils::{
     enums::GameState,
-    events::{PlayerCreateEvent, PlayerRemoveEvent},
+    events::{EquippedUse, PlayerCreateEvent, PlayerRemoveEvent},
     networking::{connection_config, PROTOCOL_ID},
     resources::{
         ClientLobby, Connected, CurrentClientId, NetworkEntities, PlayerInput, TextAsset,
@@ -21,9 +21,10 @@ use utils::{
     },
     systems::{
         animate_sprites, asset_config_loader_sytem, asset_loader_system,
-        capture_player_input_system, client_send_player_input_system, handle_input,
+        capture_player_command_input_system, capture_player_input_system,
+        client_send_player_input_system, equipment_use_system, handle_input,
         networking::client_update_system, player_create_system, player_remove_system,
-        sync_animation_state,
+        sync_animation_state, tick_equipment_system,
     },
 };
 
@@ -118,13 +119,18 @@ fn register_network_events(app: &mut App) {
 fn reigster_game_systems(app: &mut App) {
     app.insert_resource(PlayerInput::default());
 
+    app.add_event::<EquippedUse>();
+
     app.add_systems(
         Update,
         (
             capture_player_input_system,
+            capture_player_command_input_system,
             client_send_player_input_system,
             handle_input,
             sync_animation_state,
+            equipment_use_system,
+            tick_equipment_system,
         )
             .in_set(Connected),
     );

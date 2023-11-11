@@ -16,6 +16,7 @@ pub enum AssetType {
  */
 pub enum SpirteType {
     Characters,
+    Equipment,
 }
 
 /**
@@ -26,4 +27,16 @@ pub enum SpirteType {
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy)]
 pub enum Character {
     Skeleton,
+}
+
+/**
+ * Equipment Types
+ *
+ * Types of equipment expected to be loaded by asset config loader
+ */
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy)]
+pub enum Equipment {
+    Rifle,
+    Smg,
+    Shotgun,
 }

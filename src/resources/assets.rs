@@ -9,7 +9,7 @@ use bevy::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::enums::{Character, EntityState};
+use crate::enums::{Character, EntityState, Equipment};
 
 #[derive(Resource, Default)]
 pub struct AssetHandler {
@@ -19,8 +19,10 @@ pub struct AssetHandler {
 #[derive(Resource, Serialize, Deserialize)]
 pub struct AssetsConfig {
     pub sprites: SpritesConfig,
+    pub stats: StatsConfig,
 }
 
+// SPRITE CONFIG
 #[derive(Serialize, Deserialize)]
 pub struct SpritesConfig {
     pub characters: HashMap<Character, CharacterConfig>,
@@ -77,4 +79,25 @@ impl AssetLoader for TextLoader {
     fn extensions(&self) -> &[&str] {
         &["json", "toml"]
     }
+}
+
+// STATS CONFIG
+#[derive(Serialize, Deserialize)]
+pub struct StatsConfig {
+    pub equipment: HashMap<Equipment, EquipmentStats>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct EquipmentStats {
+    pub name: Equipment,
+    pub magazine: u32,
+    pub max_magazine: u32,
+    pub fire_rate: f32,
+    pub reload_time: f32,
+    pub damage: u32,
+    pub spray: f32,
+    pub projectile_speed: f32,
+    pub projectile_size: f32,
+    pub projectile_per_shot: u32,
+    pub range: u32,
 }

@@ -3,14 +3,17 @@ use bevy::sprite::TextureAtlas;
 use bevy_renet::renet::RenetServer;
 use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
 
-use crate::components::{Animator, Controllable, Player, PlayerBundle, ServerPlayerBundle};
-use crate::enums::{Character, ServerMessages};
+use crate::components::{
+    Animator, Controllable, EquipmentBundle, Player, PlayerBundle, PlayerCamera, ServerPlayerBundle,
+};
+use crate::enums::{Character, Equipment, ServerMessages};
 use crate::events::{
     ClientConnectedEvent, ClientDisconnectedEvent, PlayerCreateEvent, PlayerRemoveEvent,
 };
 use crate::networking::ServerChannel;
 use crate::resources::{
-    AssetHandler, ClientId, ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo, ServerLobby,
+    AssetHandler, AssetsConfig, ClientId, ClientLobby, CurrentClientId, NetworkEntities,
+    PlayerInfo, ServerLobby,
 };
 
 pub fn player_create_system(
@@ -20,7 +23,9 @@ pub fn player_create_system(
     mut network_mapping: ResMut<NetworkEntities>,
     client_id: Res<CurrentClientId>,
     asset_handler: Res<AssetHandler>,
+    asset_config: Res<AssetsConfig>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut windows: Query<&mut Window>,
 ) {
     for player_create in reader_player_create.iter() {
         match player_create.0 {
@@ -36,7 +41,7 @@ pub fn player_create_system(
                 if id.0 == client_id.0 {
                     let mut camera_bundle = Camera2dBundle::default();
                     camera_bundle.projection.scale = 0.5;
-                    commands.spawn(camera_bundle);
+                    commands.spawn((camera_bundle, PlayerCamera));
                 }
 
                 // Retrieve character assets from the already loaded resources
@@ -56,6 +61,8 @@ pub fn player_create_system(
                 // if this is the client player, give them control
                 if id.0 == client_id.0 {
                     player_entity.insert(Controllable);
+                    let mut window = windows.single_mut();
+                    window.cursor.icon = bevy::window::CursorIcon::Crosshair;
                 }
 
                 // Add player to network mapping
@@ -66,6 +73,20 @@ pub fn player_create_system(
 
                 lobby.players.insert(id, player_info);
                 network_mapping.0.insert(entity, player_entity.id());
+
+                let player_entity = player_entity.id();
+
+                // Spawn Equipment
+                commands
+                    .spawn(EquipmentBundle::new(
+                        asset_config
+                            .stats
+                            .equipment
+                            .get(&Equipment::Rifle)
+                            .expect("Could not find rifle in equipment config.")
+                            .into(),
+                    ))
+                    .set_parent(player_entity);
             }
             _ => {
                 println!("Received unknown message from server.");
@@ -100,6 +121,7 @@ pub fn client_connected_system(
     mut reader_client_connected: EventReader<ClientConnectedEvent>,
     mut lobby: ResMut<ServerLobby>,
     mut server: ResMut<RenetServer>,
+    asset_config: Res<AssetsConfig>,
     players: Query<(Entity, &Player, &Transform)>,
 ) {
     for client_connected in reader_client_connected.iter() {
@@ -126,6 +148,16 @@ pub fn client_connected_system(
                         ClientId(client_id),
                         Transform::from_translation(spawn_point.clone()),
                     ))
+                    .with_children(|parent| {
+                        parent.spawn(EquipmentBundle::new(
+                            asset_config
+                                .stats
+                                .equipment
+                                .get(&Equipment::Rifle)
+                                .expect("Could not find rifle in equipment config.")
+                                .into(),
+                        ));
+                    })
                     .id();
 
                 lobby.players.insert(client_id, player_entity);

@@ -29,6 +29,14 @@ pub struct Player {
 pub struct Controllable;
 
 /**
+ * Player Camera
+ *
+ * Component stating that the player entity is the camera target
+ */
+#[derive(Component, Default)]
+pub struct PlayerCamera;
+
+/**
  * Player Bundle
  *
  * Contains a player component, kinetic body bundle

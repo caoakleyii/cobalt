@@ -12,3 +12,6 @@ pub use self::body::*;
 
 pub mod network;
 pub use self::network::*;
+
+pub mod equipment;
+pub use self::equipment::*;
