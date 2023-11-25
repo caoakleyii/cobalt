@@ -4,7 +4,10 @@ use bevy_renet::renet::{RenetServer, ServerEvent};
 use crate::{
     components::SyncedEntity,
     enums::EntityState,
-    events::{ClientConnectedEvent, ClientDisconnectedEvent, PlayerInputEvent},
+    events::{
+        ClientConnectedEvent, ClientDisconnectedEvent, PlayerCommand, PlayerCommandEvent,
+        PlayerInputEvent,
+    },
     networking::{ClientChannel, NetworkedEntities, ServerChannel},
     resources::PlayerInput,
 };
@@ -12,6 +15,7 @@ pub fn server_update_system(
     mut writer_client_connected: EventWriter<ClientConnectedEvent>,
     mut writer_client_disconnected: EventWriter<ClientDisconnectedEvent>,
     mut writer_player_input: EventWriter<PlayerInputEvent>,
+    mut writer_player_command: EventWriter<PlayerCommandEvent>,
     mut server_events: EventReader<ServerEvent>,
     mut server: ResMut<RenetServer>,
 ) {
@@ -37,6 +41,11 @@ pub fn server_update_system(
         while let Some(message) = server.receive_message(client_id, ClientChannel::Input) {
             let input: PlayerInput = bincode::deserialize(&message).unwrap();
             writer_player_input.send(PlayerInputEvent(input, client_id));
+        }
+
+        while let Some(message) = server.receive_message(client_id, ClientChannel::Command) {
+            let command: PlayerCommand = bincode::deserialize(&message).unwrap();
+            writer_player_command.send(PlayerCommandEvent(command, client_id));
         }
     }
 }

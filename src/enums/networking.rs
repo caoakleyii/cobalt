@@ -1,7 +1,7 @@
-use bevy::prelude::{Component, Entity};
+use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 
-use crate::resources::ClientId;
+use crate::events::{PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent};
 
 /**
  * Server Messages
@@ -10,18 +10,9 @@ use crate::resources::ClientId;
  */
 #[derive(Debug, Serialize, Deserialize, Component)]
 pub enum ServerMessages {
-    PlayerCreate {
-        entity: Entity,
-        id: ClientId,
-        translation: [f32; 3],
-    },
-    PlayerRemove {
-        id: ClientId,
-    },
-    // SpawnProjectile {
-    //     entity: Entity,
-    //     translation: [f32; 3],
-    // },
+    PlayerCreate(PlayerCreateEvent),
+    PlayerRemove(PlayerRemoveEvent),
+    SpawnProjectile(SpawnProjectileEvent),
     // DespawnProjectile {
     //     entity: Entity,
     // },

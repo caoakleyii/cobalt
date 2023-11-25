@@ -1,7 +1,7 @@
 use bevy::prelude::Event;
 use bevy_renet::renet::ServerEvent;
 
-use crate::resources::PlayerInput;
+use crate::{events::PlayerCommand, resources::PlayerInput};
 
 /**
  * Client Connected Event
@@ -30,3 +30,11 @@ pub struct ClientDisconnectedEvent(pub ServerEvent);
  */
 #[derive(Event, Debug)]
 pub struct PlayerInputEvent(pub PlayerInput, pub u64);
+
+/**
+ * Player Command Event
+ *
+ * A Bevy Event to handle the PlayerCommand sent from the client.
+ */
+#[derive(Event, Debug)]
+pub struct PlayerCommandEvent(pub PlayerCommand, pub u64);

@@ -1,6 +1,7 @@
-use bevy::prelude::Event;
+use bevy::prelude::{Entity, Event};
+use serde::{Deserialize, Serialize};
 
-use crate::enums::ServerMessages;
+use crate::resources::ClientId;
 
 /**
  * Player Create Event
@@ -9,8 +10,12 @@ use crate::enums::ServerMessages;
  * a player should be created, contains the corresponding
  * server message
 */
-#[derive(Event, Debug)]
-pub struct PlayerCreateEvent(pub ServerMessages);
+#[derive(Event, Debug, Serialize, Deserialize)]
+pub struct PlayerCreateEvent {
+    pub entity: Entity,
+    pub id: ClientId,
+    pub translation: [f32; 3],
+}
 
 /**
  *
@@ -18,5 +23,19 @@ pub struct PlayerCreateEvent(pub ServerMessages);
  * a player should be removed, contains the corresponding
  * server message
  */
-#[derive(Event, Debug)]
-pub struct PlayerRemoveEvent(pub ServerMessages);
+#[derive(Event, Debug, Serialize, Deserialize)]
+pub struct PlayerRemoveEvent {
+    pub id: ClientId,
+}
+
+/**
+ *
+ * A Bevy Event to inform client systems
+ * a projectile should be spawned, contains the corresponding
+ * server message
+ */
+#[derive(Event, Debug, Serialize, Deserialize)]
+pub struct SpawnProjectileEvent {
+    pub translation: [f32; 3],
+    pub velocity: [f32; 2],
+}

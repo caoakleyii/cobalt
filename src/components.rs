@@ -15,3 +15,6 @@ pub use self::network::*;
 
 pub mod equipment;
 pub use self::equipment::*;
+
+pub mod projectile;
+pub use self::projectile::*;

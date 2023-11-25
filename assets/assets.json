@@ -47,8 +47,8 @@
                 "reload_time": 1.0,
                 "damage": 10,
                 "spray": 0.3,
-                "projectile_speed": 10.0,
-                "projectile_size": 1.0,
+                "projectile_speed": 900.0,
+                "projectile_size": 900.0,
                 "projectile_per_shot": 1,
                 "range": 1000
             },

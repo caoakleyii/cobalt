@@ -13,18 +13,20 @@ use bevy_renet::{
 
 use utils::{
     enums::GameState,
-    events::{EquippedUse, PlayerCreateEvent, PlayerRemoveEvent},
+    events::{
+        EquippedUse, PlayerCommand, PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent,
+    },
     networking::{connection_config, PROTOCOL_ID},
     resources::{
         ClientLobby, Connected, CurrentClientId, NetworkEntities, PlayerInput, TextAsset,
         TextLoader,
     },
     systems::{
-        animate_sprites, asset_config_loader_sytem, asset_loader_system,
+        animate_sprites, apply_velocity, asset_config_loader_sytem, asset_loader_system,
         capture_player_command_input_system, capture_player_input_system,
-        client_send_player_input_system, equipment_use_system, handle_input,
+        client_send_player_command_events, client_send_player_input_system, handle_input,
         networking::client_update_system, player_create_system, player_remove_system,
-        sync_animation_state, tick_equipment_system,
+        spawn_projectile, sync_animation_state, tick_equipment_system,
     },
 };
 
@@ -108,10 +110,16 @@ fn connect_client_and_network_systems(app: &mut App) {
 fn register_network_events(app: &mut App) {
     app.add_event::<PlayerCreateEvent>();
     app.add_event::<PlayerRemoveEvent>();
+    app.add_event::<SpawnProjectileEvent>();
 
     app.add_systems(
         Update,
-        (player_create_system, player_remove_system).in_set(Connected),
+        (
+            player_create_system,
+            player_remove_system,
+            client_send_player_command_events,
+        )
+            .in_set(Connected),
     );
 }
 
@@ -119,7 +127,10 @@ fn register_network_events(app: &mut App) {
 fn reigster_game_systems(app: &mut App) {
     app.insert_resource(PlayerInput::default());
 
+    // Some of this can be moved to a plugin
+    // or abstracted so both client and server can use it
     app.add_event::<EquippedUse>();
+    app.add_event::<PlayerCommand>();
 
     app.add_systems(
         Update,
@@ -129,8 +140,9 @@ fn reigster_game_systems(app: &mut App) {
             client_send_player_input_system,
             handle_input,
             sync_animation_state,
-            equipment_use_system,
             tick_equipment_system,
+            apply_velocity,
+            spawn_projectile,
         )
             .in_set(Connected),
     );

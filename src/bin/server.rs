@@ -6,14 +6,18 @@ use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication,
 use bevy_renet::renet::RenetServer;
 use bevy_renet::{transport::NetcodeServerPlugin, RenetServerPlugin};
 use utils::enums::GameState;
-use utils::events::{ClientConnectedEvent, ClientDisconnectedEvent, PlayerInputEvent};
+use utils::events::{
+    ClientConnectedEvent, ClientDisconnectedEvent, EquippedUse, PlayerCommandEvent,
+    PlayerInputEvent,
+};
 use utils::networking::{connection_config, PROTOCOL_ID};
 use utils::resources::{ServerLobby, TextAsset, TextLoader};
 use utils::systems::networking::server::server_update_system;
 use utils::systems::{
-    asset_config_loader_sytem, asset_loader_system, client_connected_system,
-    client_disconnected_system, handle_input, server_network_sync,
-    server_receive_player_input_system,
+    apply_velocity, asset_config_loader_sytem, asset_loader_system,
+    client_connected_to_server_system, client_disconnected_system, equipment_use_system,
+    handle_input, server_network_sync, server_receive_player_command_system,
+    server_receive_player_input_system, tick_equipment_system,
 };
 
 fn main() {
@@ -78,15 +82,21 @@ fn register_network_events(app: &mut App) {
     app.add_event::<ClientConnectedEvent>();
     app.add_event::<ClientDisconnectedEvent>();
     app.add_event::<PlayerInputEvent>();
+    app.add_event::<PlayerCommandEvent>();
+    app.add_event::<EquippedUse>();
 
     app.add_systems(
         Update,
         (
-            client_connected_system,
+            client_connected_to_server_system,
             client_disconnected_system,
             server_receive_player_input_system,
             server_network_sync,
             handle_input,
+            server_receive_player_command_system,
+            tick_equipment_system,
+            equipment_use_system,
+            apply_velocity,
         )
             .run_if(in_state(GameState::Gameloop)),
     );

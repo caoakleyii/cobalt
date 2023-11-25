@@ -1,9 +1,11 @@
 use bevy::{
-    prelude::{Bundle, Component},
+    prelude::{Bundle, Component, Vec2, Vec3},
     time::{Timer, TimerMode},
 };
 
 use crate::{enums::Equipment as EquipmentType, resources::EquipmentStats};
+
+use super::{Speed, Velocity};
 
 // BUNDLE NEEDED for equipment and animation etc.
 #[derive(Clone, Debug, Bundle)]
@@ -62,12 +64,40 @@ impl From<&EquipmentStats> for Equipment {
 }
 
 impl Equipment {
+    pub fn use_equipment(&mut self, from: &Vec3, at: &Vec2) -> Velocity {
+        self.fire_rate_timer.reset();
+        self.magazine -= 1;
+
+        let from = Vec2::new(from.x, from.y);
+        let angle = angle_between(&from, at);
+
+        Velocity {
+            base_speed: Speed(self.projectile_speed),
+            current_speed: Speed(self.projectile_speed),
+            rotation: angle,
+            vector: Vec2::new(
+                angle.cos() * self.projectile_speed,
+                angle.sin() * self.projectile_speed,
+            ),
+        }
+    }
+
     pub fn empty(&self) -> bool {
         self.magazine == 0
+    }
+
+    pub fn reload(&mut self) {
+        self.magazine = self.max_magazine;
     }
 }
 
 #[derive(Clone, Debug, Component)]
 pub struct Inventory {
     pub items: Vec<Equipped>,
+}
+
+pub fn angle_between(from: &Vec2, to: &Vec2) -> f32 {
+    let y = to.y - from.y;
+    let x = to.x - from.x;
+    y.atan2(x)
 }

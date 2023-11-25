@@ -3,7 +3,7 @@ use bevy_renet::renet::RenetClient;
 
 use crate::{
     enums::ServerMessages,
-    events::{PlayerCreateEvent, PlayerRemoveEvent},
+    events::{PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent},
     networking::{NetworkedEntities, ServerChannel},
     resources::NetworkEntities,
 };
@@ -11,6 +11,7 @@ use crate::{
 pub fn client_update_system(
     mut writer_player_create: EventWriter<PlayerCreateEvent>,
     mut writer_player_remove: EventWriter<PlayerRemoveEvent>,
+    mut writer_spawn_projectile: EventWriter<SpawnProjectileEvent>,
     mut client: ResMut<RenetClient>,
     network_mapping: ResMut<NetworkEntities>,
     mut commands: Commands,
@@ -18,11 +19,14 @@ pub fn client_update_system(
     while let Some(message) = client.receive_message(ServerChannel::ServerMessages) {
         let server_message: ServerMessages = bincode::deserialize(&message).unwrap();
         match server_message {
-            ServerMessages::PlayerCreate { .. } => {
-                writer_player_create.send(PlayerCreateEvent(server_message));
+            ServerMessages::PlayerCreate(player_create_event) => {
+                writer_player_create.send(player_create_event);
             }
-            ServerMessages::PlayerRemove { .. } => {
-                writer_player_remove.send(PlayerRemoveEvent(server_message));
+            ServerMessages::PlayerRemove(player_remove_event) => {
+                writer_player_remove.send(player_remove_event);
+            }
+            ServerMessages::SpawnProjectile(spawn_projectile_event) => {
+                writer_spawn_projectile.send(spawn_projectile_event);
             }
         };
     }

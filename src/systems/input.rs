@@ -5,7 +5,7 @@ use bevy_renet::renet::RenetClient;
 use crate::components::{Controllable, Equipped, Player, PlayerCamera, Velocity};
 
 use crate::enums::EntityState;
-use crate::events::{EquippedUse, PlayerInputEvent};
+use crate::events::{EquippedUse, PlayerCommand, PlayerCommandEvent, PlayerInputEvent};
 use crate::networking::ClientChannel;
 use crate::resources::{ClientId, ClientLobby, CurrentClientId, PlayerInput, ServerLobby};
 
@@ -62,19 +62,29 @@ pub fn capture_player_command_input_system(
     _keyboard_input: Res<Input<KeyCode>>,
     player_query: Query<&Children, (With<Controllable>, With<Player>)>,
     equipment_query: Query<Entity, With<Equipped>>,
-    mut writer_equippable_use: EventWriter<EquippedUse>,
+    mut writer_player_command_event: EventWriter<PlayerCommand>,
 ) {
     if mouse_input.pressed(MouseButton::Left) {
         if let Ok(children) = player_query.get_single() {
             for &child in children.iter() {
-                if let Ok(equipment_entity) = equipment_query.get(child) {
-                    writer_equippable_use.send(EquippedUse {
-                        entity: equipment_entity,
-                        at: player_input.aim,
+                if let Ok(_equipment_entity) = equipment_query.get(child) {
+                    writer_player_command_event.send(PlayerCommand::UseEquipment {
+                        cast_at: player_input.aim,
                     })
                 }
             }
         }
+    }
+}
+
+// TODO: Probably needs some sort of throttilng to prevent spamming
+pub fn client_send_player_command_events(
+    mut client: ResMut<RenetClient>,
+    mut reader_player_command_event: EventReader<PlayerCommand>,
+) {
+    for player_command_event in reader_player_command_event.iter() {
+        let player_command_message = bincode::serialize(&player_command_event).unwrap();
+        client.send_message(ClientChannel::Command, player_command_message);
     }
 }
 
@@ -93,11 +103,29 @@ pub fn server_receive_player_input_system(
     }
 }
 
-pub fn handle_input(
-    dt: Res<Time>,
-    mut query: Query<(&mut Transform, &PlayerInput, &Velocity, &mut EntityState)>,
+pub fn server_receive_player_command_system(
+    mut writer_equippable_use: EventWriter<EquippedUse>,
+    mut reader_player_command_event: EventReader<PlayerCommandEvent>,
+    lobby: ResMut<ServerLobby>,
 ) {
-    for (mut transform, player_input, vel, mut state) in &mut query {
+    for player_command_event in reader_player_command_event.iter() {
+        let player_command = &player_command_event.0;
+        let client_id = player_command_event.1;
+        if let Some(player_entity) = lobby.players.get(&client_id) {
+            match player_command {
+                PlayerCommand::UseEquipment { cast_at } => {
+                    writer_equippable_use.send(EquippedUse {
+                        entity: *player_entity,
+                        at: cast_at.clone(),
+                    })
+                }
+            }
+        }
+    }
+}
+
+pub fn handle_input(mut query: Query<(&PlayerInput, &mut Velocity, &mut EntityState)>) {
+    for (player_input, mut vel, mut state) in &mut query {
         let mut fx = 0.0;
         let mut fy = 0.0;
 
@@ -122,7 +150,7 @@ pub fn handle_input(
             *state = crate::enums::EntityState::Idle;
         }
 
-        transform.translation.x += (force.x * *vel.current_speed) * dt.delta_seconds();
-        transform.translation.y += (force.y * *vel.current_speed) * dt.delta_seconds();
+        vel.vector.x = force.x * *vel.current_speed;
+        vel.vector.y = force.y * *vel.current_speed;
     }
 }

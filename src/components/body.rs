@@ -9,7 +9,7 @@ use super::{Animated2DObjectBundle, Object2DBundle};
  * ? Perhaps can be removed as a container since we have a velocity
  * ? component now.
  */
-#[derive(Component, Deref, DerefMut)]
+#[derive(Component, Deref, DerefMut, Debug)]
 pub struct Speed(pub f32);
 
 impl Default for Speed {
@@ -23,7 +23,7 @@ impl Default for Speed {
  *
  * Component to define the velocity of an object
  */
-#[derive(Component, Default)]
+#[derive(Component, Default, Debug)]
 pub struct Velocity {
     pub base_speed: Speed,
 
@@ -32,6 +32,21 @@ pub struct Velocity {
     pub rotation: f32,
 
     pub vector: Vec2,
+}
+
+impl From<[f32; 2]> for Velocity {
+    fn from(vector: [f32; 2]) -> Self {
+        let x = vector[0];
+        let y = vector[1];
+        let speed = f32::sqrt(x.powi(2) + y.powi(2));
+
+        Self {
+            vector: Vec2::from(vector),
+            rotation: y.atan2(x),
+            current_speed: Speed(speed),
+            base_speed: Speed(speed),
+        }
+    }
 }
 
 // ! TODO: Define or use a bevy/library hitbox bundle
