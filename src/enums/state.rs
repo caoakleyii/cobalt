@@ -12,6 +12,8 @@ pub enum EntityState {
     Idle,
     Walk,
     Run,
+    Shoot,
+    Reload,
 }
 
 /**
@@ -32,15 +34,11 @@ pub enum GameState {
  *
  * Up, Down, Left, Right
  */
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, Default, Component)]
 pub enum EgocentricDirection {
     Up,
     Down,
     Left,
+    #[default]
     Right,
-}
-
-impl Default for EgocentricDirection {
-    fn default() -> Self {
-        EgocentricDirection::Right
-    }
 }

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bevy::prelude::{Entity, Resource, SystemSet};
+use bevy::prelude::{Deref, Entity, Resource, SystemSet};
 use serde::{Deserialize, Serialize};
 
 /// A System Set that runs when a client is connected
@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 pub struct Connected;
 
 /// A struct that holds a client id
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Deref)]
 pub struct ClientId(pub u64);
 
 /// A struct that holds the current client's id

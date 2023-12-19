@@ -1,19 +1,22 @@
 use std::collections::HashMap;
 
 use bevy::{
-    asset::{AssetLoader, LoadContext, LoadedAsset},
-    prelude::{Handle, Resource},
+    asset::{AssetLoader, AsyncReadExt, LoadContext},
+    prelude::{Asset, Deref, Handle, Resource},
     reflect::{TypePath, TypeUuid},
     sprite::TextureAtlas,
     utils::BoxedFuture,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::enums::{Character, EntityState, Equipment};
+use crate::enums::{EntityState, Equipment, Sprites};
+
+#[derive(Resource, Default, Deref)]
+pub struct AssetLoading(pub u32);
 
 #[derive(Resource, Default)]
 pub struct AssetHandler {
-    pub character_textures: HashMap<Character, (TextureAtlas, Vec<AnimationConfig>)>,
+    pub textures: HashMap<Sprites, (TextureAtlas, Vec<AnimationConfig>)>,
 }
 
 #[derive(Resource, Serialize, Deserialize)]
@@ -25,12 +28,12 @@ pub struct AssetsConfig {
 // SPRITE CONFIG
 #[derive(Serialize, Deserialize)]
 pub struct SpritesConfig {
-    pub characters: HashMap<Character, CharacterConfig>,
+    pub textures: HashMap<Sprites, SpriteConfig>,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct CharacterConfig {
-    pub name: Character,
+pub struct SpriteConfig {
+    pub name: Sprites,
     pub path: String,
     pub width: f32,
     pub height: f32,
@@ -55,7 +58,7 @@ pub struct AssetConfigTextHandler {
     pub handle: Handle<TextAsset>,
 }
 
-#[derive(Debug, TypeUuid, TypePath)]
+#[derive(Debug, TypeUuid, TypePath, Asset)]
 #[uuid = "ff866d71-0c0e-4af0-8437-a4177ed03f2c"]
 pub struct TextAsset(pub String);
 
@@ -63,16 +66,24 @@ pub struct TextAsset(pub String);
 pub struct TextLoader;
 
 impl AssetLoader for TextLoader {
+    type Asset = TextAsset;
+
+    type Settings = ();
+
+    type Error = std::io::Error;
+
     fn load<'a>(
         &'a self,
-        bytes: &'a [u8],
-        load_context: &'a mut LoadContext,
-    ) -> BoxedFuture<'a, Result<(), bevy::asset::Error>> {
+        reader: &'a mut bevy::asset::io::Reader,
+        _settings: &'a Self::Settings,
+        _load_context: &'a mut LoadContext,
+    ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
-            let data_str = std::str::from_utf8(bytes)?;
+            let mut bytes = Vec::<u8>::new();
+            reader.read_to_end(&mut bytes).await?;
+            let data_str = std::str::from_utf8(&bytes).expect("Could not parse the asset config.");
             let asset = TextAsset(data_str.into());
-            load_context.set_default_asset(LoadedAsset::new(asset));
-            Ok(())
+            Ok(asset)
         })
     }
 

@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 use bevy::sprite::TextureAtlas;
+use bevy_health_bar::ProgressBarBundle;
 use bevy_renet::renet::RenetServer;
 use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
 
 use crate::components::{
-    Animator, Controllable, EquipmentBundle, Player, PlayerBundle, PlayerCamera, ServerPlayerBundle,
+    Animator, Controllable, EquipmentBundle, Player, PlayerBundle, PlayerCamera,
+    ServerEquipmentBundle, ServerPlayerBundle,
 };
-use crate::enums::{Character, Equipment, ServerMessages};
+use crate::enums::{Equipment, ServerMessages, Sprites};
 use crate::events::{
     ClientConnectedEvent, ClientDisconnectedEvent, PlayerCreateEvent, PlayerRemoveEvent,
 };
@@ -26,8 +28,9 @@ pub fn player_create_system(
     asset_config: Res<AssetsConfig>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     mut windows: Query<&mut Window>,
+    asset_server: Res<AssetServer>,
 ) {
-    for player_create_event in reader_player_create.iter() {
+    for player_create_event in reader_player_create.read() {
         println!("Player {} connected.", player_create_event.id.0);
 
         // TODO: Move this to a better camera system that allows for targets
@@ -40,13 +43,13 @@ pub fn player_create_system(
 
         // Retrieve character assets from the already loaded resources
         let (texture, animations) = asset_handler
-            .character_textures
-            .get(&Character::Skeleton)
+            .textures
+            .get(&Sprites::Skeleton)
             .expect("unexpected character requested.");
 
         // Spawn Player
         let mut player_entity = commands.spawn(PlayerBundle::new(
-            player_create_event.id,
+            bevy_renet::renet::ClientId::from_raw(*player_create_event.id),
             Animator::import(animations),
             texture_atlases.add(texture.clone()),
             Transform::from_xyz(
@@ -76,6 +79,12 @@ pub fn player_create_system(
 
         let player_entity = player_entity.id();
 
+        // Retrieve character assets from the already loaded resources
+        let (texture, animations) = asset_handler
+            .textures
+            .get(&Sprites::AK47)
+            .expect("unexpected character requested.");
+
         // Spawn Equipment
         commands
             .spawn(EquipmentBundle::new(
@@ -85,7 +94,19 @@ pub fn player_create_system(
                     .get(&Equipment::Rifle)
                     .expect("Could not find rifle in equipment config.")
                     .into(),
+                Animator::import(animations),
+                texture_atlases.add(texture.clone()),
+                Transform::from_xyz(5.0, -1.5, 0.0),
             ))
+            .set_parent(player_entity);
+
+        // Spawn Health Bar
+        let transform = Transform::from_xyz(-15.0, 19.0, 0.0).with_scale(Vec3::new(0.5, 0.5, 0.5));
+        commands
+            .spawn(
+                ProgressBarBundle::new(100.0, asset_server.load("ui/health_bar.png"))
+                    .with_transform(transform),
+            )
             .set_parent(player_entity);
     }
 }
@@ -96,7 +117,7 @@ pub fn player_remove_system(
     mut lobby: ResMut<ClientLobby>,
     mut network_mapping: ResMut<NetworkEntities>,
 ) {
-    for player_remove_event in reader_player_remove.iter() {
+    for player_remove_event in reader_player_remove.read() {
         println!("Player {} disconnected.", player_remove_event.id.0);
 
         if let Some(player_info) = lobby.players.remove(&player_remove_event.id) {
@@ -114,17 +135,17 @@ pub fn client_connected_to_server_system(
     asset_config: Res<AssetsConfig>,
     players: Query<(Entity, &Player, &Transform)>,
 ) {
-    for client_connected in reader_client_connected.iter() {
+    for client_connected in reader_client_connected.read() {
         match client_connected.0 {
             ClientConnected { client_id } => {
                 println!("Player {} connected.", client_id);
 
                 // initialize the newly connected client with the current state of the players in the game
-                for (entity, player, transform) in players.iter() {
+                for (entity, player, transform) in &players {
                     let translation: [f32; 3] = transform.translation.into();
                     let message =
                         bincode::serialize(&ServerMessages::PlayerCreate(PlayerCreateEvent {
-                            id: player.id,
+                            id: ClientId(player.id.raw()),
                             entity,
                             translation,
                         }))
@@ -136,11 +157,11 @@ pub fn client_connected_to_server_system(
                 let spawn_point = Vec3::new(0.0, 0.0, 0.0);
                 let player_entity = commands
                     .spawn(ServerPlayerBundle::new(
-                        ClientId(client_id),
+                        client_id,
                         Transform::from_translation(spawn_point.clone()),
                     ))
                     .with_children(|parent| {
-                        parent.spawn(EquipmentBundle::new(
+                        parent.spawn(ServerEquipmentBundle::new(
                             asset_config
                                 .stats
                                 .equipment
@@ -151,12 +172,12 @@ pub fn client_connected_to_server_system(
                     })
                     .id();
 
-                lobby.players.insert(client_id, player_entity);
+                lobby.players.insert(client_id.raw(), player_entity);
 
                 // send the player entity to the client
                 let message =
                     bincode::serialize(&ServerMessages::PlayerCreate(PlayerCreateEvent {
-                        id: ClientId(client_id),
+                        id: ClientId(client_id.raw()),
                         entity: player_entity,
                         translation: spawn_point.to_array(),
                     }))
@@ -174,18 +195,18 @@ pub fn client_disconnected_system(
     mut lobby: ResMut<ServerLobby>,
     mut server: ResMut<RenetServer>,
 ) {
-    for client_disconnected in reader_client_disconnected.iter() {
+    for client_disconnected in reader_client_disconnected.read() {
         match client_disconnected.0 {
             ClientDisconnected { client_id, reason } => {
                 println!("Player {} disconnected. {}", client_id, reason);
 
-                if let Some(player_entity) = lobby.players.remove(&client_id) {
+                if let Some(player_entity) = lobby.players.remove(&client_id.raw()) {
                     commands.entity(player_entity).despawn();
                 }
 
                 let message =
                     bincode::serialize(&ServerMessages::PlayerRemove(PlayerRemoveEvent {
-                        id: ClientId(client_id),
+                        id: ClientId(client_id.raw()),
                     }))
                     .unwrap();
                 server.broadcast_message(ServerChannel::ServerMessages, message);

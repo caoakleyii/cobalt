@@ -1,19 +1,50 @@
 use bevy::{
-    prelude::{Bundle, Component, Vec2, Vec3},
+    prelude::{Bundle, Component, Handle, Transform, Vec2, Vec3},
+    sprite::{SpriteSheetBundle, TextureAtlas},
     time::{Timer, TimerMode},
 };
 
 use crate::{enums::Equipment as EquipmentType, resources::EquipmentStats};
 
-use super::{Speed, Velocity};
+use super::{Animated2DObjectBundle, Animator, Speed, Velocity};
 
 // BUNDLE NEEDED for equipment and animation etc.
-#[derive(Clone, Debug, Bundle)]
+#[derive(Clone, Bundle)]
 pub struct EquipmentBundle {
     pub equipped: Equipped,
+
+    pub animated_2d_object: Animated2DObjectBundle,
 }
 
 impl EquipmentBundle {
+    pub fn new(
+        equipment: Equipment,
+        animator: Animator,
+        texture_atlas: Handle<TextureAtlas>,
+        transform: Transform,
+    ) -> Self {
+        Self {
+            equipped: Equipped { equipment },
+            animated_2d_object: Animated2DObjectBundle {
+                animator,
+                sprite_sheet_bundle: SpriteSheetBundle {
+                    texture_atlas,
+                    transform,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        }
+    }
+}
+
+// BUNDLE NEEDED for equipment and animation etc.
+#[derive(Clone, Bundle)]
+pub struct ServerEquipmentBundle {
+    pub equipped: Equipped,
+}
+
+impl ServerEquipmentBundle {
     pub fn new(equipment: Equipment) -> Self {
         Self {
             equipped: Equipped { equipment },
@@ -68,7 +99,7 @@ impl Equipment {
         self.fire_rate_timer.reset();
         self.magazine -= 1;
 
-        let from = Vec2::new(from.x, from.y);
+        let from = vec2_from_vec3(from);
         let angle = angle_between(&from, at);
 
         Velocity {
@@ -100,4 +131,8 @@ pub fn angle_between(from: &Vec2, to: &Vec2) -> f32 {
     let y = to.y - from.y;
     let x = to.x - from.x;
     y.atan2(x)
+}
+
+pub fn vec2_from_vec3(from: &Vec3) -> Vec2 {
+    Vec2::new(from.x, from.y)
 }

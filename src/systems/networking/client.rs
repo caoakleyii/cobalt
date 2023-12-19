@@ -2,6 +2,7 @@ use bevy::prelude::{Commands, EventWriter, ResMut, Transform};
 use bevy_renet::renet::RenetClient;
 
 use crate::{
+    components::Aim,
     enums::ServerMessages,
     events::{PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent},
     networking::{NetworkedEntities, ServerChannel},
@@ -45,8 +46,9 @@ pub fn client_update_system(
                     ..Default::default()
                 };
                 let state = networked_entities.states[i];
+                let aim = Aim(networked_entities.aim_ats[i].into());
                 if let Some(mut entity_command) = commands.get_entity(*entity) {
-                    entity_command.insert((transform, state));
+                    entity_command.insert((transform, state, aim));
                 }
             }
         }

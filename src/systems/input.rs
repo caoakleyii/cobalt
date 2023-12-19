@@ -82,7 +82,7 @@ pub fn client_send_player_command_events(
     mut client: ResMut<RenetClient>,
     mut reader_player_command_event: EventReader<PlayerCommand>,
 ) {
-    for player_command_event in reader_player_command_event.iter() {
+    for player_command_event in reader_player_command_event.read() {
         let player_command_message = bincode::serialize(&player_command_event).unwrap();
         client.send_message(ClientChannel::Command, player_command_message);
     }
@@ -93,7 +93,7 @@ pub fn server_receive_player_input_system(
     mut reader_player_input_event: EventReader<PlayerInputEvent>,
     lobby: ResMut<ServerLobby>,
 ) {
-    for player_input_event in reader_player_input_event.iter() {
+    for player_input_event in reader_player_input_event.read() {
         let player_input = player_input_event.0;
         let client_id = player_input_event.1;
 
@@ -108,7 +108,7 @@ pub fn server_receive_player_command_system(
     mut reader_player_command_event: EventReader<PlayerCommandEvent>,
     lobby: ResMut<ServerLobby>,
 ) {
-    for player_command_event in reader_player_command_event.iter() {
+    for player_command_event in reader_player_command_event.read() {
         let player_command = &player_command_event.0;
         let client_id = player_command_event.1;
         if let Some(player_entity) = lobby.players.get(&client_id) {

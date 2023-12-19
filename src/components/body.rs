@@ -19,6 +19,17 @@ impl Default for Speed {
 }
 
 /**
+ * Health
+ *
+ * Component to define the health of an object
+ */
+#[derive(Component, Default, Debug)]
+pub struct Health {
+    pub current: f32,
+    pub max: f32,
+}
+
+/**
  * Velocity
  *
  * Component to define the velocity of an object

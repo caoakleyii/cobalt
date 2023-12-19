@@ -19,7 +19,7 @@ pub fn server_update_system(
     mut server_events: EventReader<ServerEvent>,
     mut server: ResMut<RenetServer>,
 ) {
-    for event in server_events.iter() {
+    for event in server_events.read() {
         match event {
             ServerEvent::ClientConnected { client_id } => {
                 writer_client_connected.send(ClientConnectedEvent(ServerEvent::ClientConnected {
@@ -40,26 +40,27 @@ pub fn server_update_system(
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, ClientChannel::Input) {
             let input: PlayerInput = bincode::deserialize(&message).unwrap();
-            writer_player_input.send(PlayerInputEvent(input, client_id));
+            writer_player_input.send(PlayerInputEvent(input, client_id.raw()));
         }
 
         while let Some(message) = server.receive_message(client_id, ClientChannel::Command) {
             let command: PlayerCommand = bincode::deserialize(&message).unwrap();
-            writer_player_command.send(PlayerCommandEvent(command, client_id));
+            writer_player_command.send(PlayerCommandEvent(command, client_id.raw()));
         }
     }
 }
 
 pub fn server_network_sync(
     mut server: ResMut<RenetServer>,
-    query: Query<(Entity, &Transform, &EntityState), With<SyncedEntity>>,
+    query: Query<(Entity, &Transform, &EntityState, &PlayerInput), With<SyncedEntity>>,
 ) {
     let mut networked_entities = NetworkedEntities::default();
-    for (entity, transform, entity_state) in query.iter() {
+    for (entity, transform, entity_state, player_input) in query.iter() {
         networked_entities.entities.push(entity);
         networked_entities
             .translations
             .push(transform.translation.into());
+        networked_entities.aim_ats.push(player_input.aim.into());
         networked_entities.states.push(*entity_state)
     }
 

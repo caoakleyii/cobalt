@@ -5,7 +5,7 @@ use bevy::prelude::{Bundle, Component, Transform};
  *
  * Component to define and query  2D Objects
  */
-#[derive(Component, Default)]
+#[derive(Clone, Component, Default)]
 pub struct Object2D;
 
 /**
@@ -13,7 +13,7 @@ pub struct Object2D;
  *
  * Width and Height
  */
-#[derive(Component, Default)]
+#[derive(Clone, Component, Default)]
 pub struct Size {
     pub width: f32,
 
@@ -26,7 +26,7 @@ pub struct Size {
  * Base Bundle for any object that will exist in the game world without
  * animations/sprites
  */
-#[derive(Bundle, Default)]
+#[derive(Clone, Bundle, Default)]
 pub struct Object2DBundle {
     pub transform: Transform,
 

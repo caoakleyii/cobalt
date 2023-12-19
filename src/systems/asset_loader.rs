@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
 use bevy::{
-    prelude::{AssetServer, Assets, Commands, Handle, Image, NextState, Res, ResMut, Vec2},
+    prelude::{
+        AssetEvent, AssetServer, Assets, Commands, EventReader, Handle, Image, NextState, Res,
+        ResMut, Vec2,
+    },
+    render::texture::ImageSampler,
     sprite::TextureAtlas,
 };
 
@@ -35,7 +39,7 @@ pub fn asset_loader_system(
 
         asset_config
             .sprites
-            .characters
+            .textures
             .iter()
             .for_each(|(key, char_config)| {
                 let image_handle: Handle<Image> = asset_server.load(char_config.path.clone());
@@ -53,12 +57,28 @@ pub fn asset_loader_system(
             });
 
         let asset_handler = AssetHandler {
-            character_textures: character_handles,
+            textures: character_handles,
         };
 
         commands.insert_resource(asset_handler);
         commands.insert_resource(asset_config);
-
         state.set(GameState::Gameloop);
+    }
+}
+
+pub fn asset_loader_state_system(
+    mut image_events: EventReader<AssetEvent<Image>>,
+    mut assets: ResMut<Assets<Image>>,
+) {
+    for event in image_events.read() {
+        match event {
+            AssetEvent::Added { id } => {
+                let image = assets
+                    .get_mut(*id)
+                    .expect("Failed to retrieve added image.");
+                image.sampler = ImageSampler::nearest();
+            }
+            _ => {}
+        }
     }
 }

@@ -1,6 +1,6 @@
 {
     "sprites": {
-        "characters": {
+        "textures": {
             "Skeleton": {
                 "name": "Skeleton",
                 "path": "skeleton/normal_white_sheet.png",
@@ -29,6 +29,94 @@
                         "name":"Run",
                         "start_index": 16,
                         "end_index": 23,
+                        "should_loop": true,
+                        "is_default": false,
+                        "frame_speed": 0.1
+                    }
+                ]
+            },
+            "Bullet": {
+                "name": "Bullet",
+                "path": "projectiles/projectile.png",
+                "width": 32.0,
+                "height": 32.0,
+                "columns": 2,
+                "rows": 5,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 5,
+                        "end_index": 5,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1
+                    }
+                ]
+            },
+            "SmgBullet": {
+                "name": "SmgBullet",
+                "path": "projectiles/projectile.png",
+                "width": 32.0,
+                "height": 32.0,
+                "columns": 2,
+                "rows": 5,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 6,
+                        "end_index": 6,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1
+                    }
+                ]
+            },
+            "ShotgunBullet": {
+                "name": "ShotgunBullet",
+                "path": "projectiles/projectile.png",
+                "width": 32.0,
+                "height": 32.0,
+                "columns": 2,
+                "rows": 5,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 3,
+                        "end_index": 3,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1
+                    }
+                ]
+            },
+            "AK47": {
+                "name": "AK47",
+                "path": "equipment/smgs.png",
+                "width": 96.0,
+                "height": 32.0,
+                "columns": 4,
+                "rows": 11,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 11,
+                        "end_index": 11,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1
+                    },
+                    {
+                        "name": "Shoot",
+                        "start_index": 8,
+                        "end_index": 11,
+                        "should_loop": true,
+                        "is_default": false,
+                        "frame_speed": 0.1
+                    },
+                    {
+                        "name": "Reload",
+                        "start_index": 3,
+                        "end_index": 3,
                         "should_loop": true,
                         "is_default": false,
                         "frame_speed": 0.1

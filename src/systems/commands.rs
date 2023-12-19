@@ -1,8 +1,5 @@
 use bevy::{
-    prelude::{
-        AssetServer, Assets, Children, Commands, EventReader, Handle, Image, Quat, Query, Res,
-        ResMut, Transform, Vec2,
-    },
+    prelude::{Assets, Children, Commands, EventReader, Quat, Query, Res, ResMut, Transform},
     sprite::TextureAtlas,
     time::Time,
 };
@@ -12,10 +9,13 @@ use crate::{
     components::{
         projectile::ProjectileBundle, Animator, Equipped, ServerProjectileBundle, Velocity,
     },
-    enums::{EntityState, ServerMessages},
+    enums::{
+        ServerMessages,
+        Sprites::{self},
+    },
     events::{EquippedUse, SpawnProjectileEvent},
     networking::ServerChannel,
-    resources::AnimationConfig,
+    resources::AssetHandler,
 };
 
 pub fn equipment_use_system(
@@ -26,7 +26,7 @@ pub fn equipment_use_system(
     transform_query: Query<&Transform>,
     equipped_children_query: Query<&Children>,
 ) {
-    reader_equippable_use.iter().for_each(|equippable_use| {
+    reader_equippable_use.read().for_each(|equippable_use| {
         if let Ok(children) = equipped_children_query.get(equippable_use.entity) {
             for &child in children.iter() {
                 if let Ok(mut equipped) = query.get_mut(child) {
@@ -67,29 +67,22 @@ pub fn equipment_use_system(
 pub fn spawn_projectile(
     mut reader_spawn_projectile: EventReader<SpawnProjectileEvent>,
     mut command: Commands,
+    asset_handler: Res<AssetHandler>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    asset_server: Res<AssetServer>,
 ) {
-    for spawn_projectile in reader_spawn_projectile.iter() {
-        let projectile_handle: Handle<Image> = asset_server.load("projectile.png");
-        let texture_atlas =
-            TextureAtlas::from_grid(projectile_handle, Vec2::new(32.0, 32.0), 2, 5, None, None);
-        let texture_atlas_handle = texture_atlases.add(texture_atlas);
-        let animator = Animator::import(&vec![AnimationConfig {
-            name: EntityState::Idle,
-            start_index: 2,
-            end_index: 2,
-            should_loop: true,
-            is_default: true,
-            frame_speed: 0.1,
-        }]);
+    for spawn_projectile in reader_spawn_projectile.read() {
+        let (texture, animations) = asset_handler
+            .textures
+            .get(&Sprites::Bullet)
+            .expect("Could not find projectile texture in asset handler.");
+
         let velocity: Velocity = spawn_projectile.velocity.into();
         let mut transform = Transform::from_translation(spawn_projectile.translation.into());
         transform.rotation = Quat::from_rotation_z(velocity.rotation);
 
         command.spawn(ProjectileBundle::new(
-            animator,
-            texture_atlas_handle,
+            Animator::import(animations),
+            texture_atlases.add(texture.clone()),
             transform,
             velocity,
         ));

@@ -1,32 +1,17 @@
 use serde::{Deserialize, Serialize};
 
 /**
- * Asset Types
+ *  Sprite Types
  *
- * Type of assets expected to be loaded by asset config loader
- */
-pub enum AssetType {
-    Sprite,
-}
-
-/**
- * Sprite Types
- *
- * Type of sprites expected to be loaded by asset config loader
- */
-pub enum SpirteType {
-    Characters,
-    Equipment,
-}
-
-/**
- *  Character Types
- *
- * Types of characters expected to be loaded by asset config loader
+ * Types of sprite assets expected to be loaded by asset config loader
  */
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy)]
-pub enum Character {
+pub enum Sprites {
     Skeleton,
+    Bullet,
+    SmgBullet,
+    ShotgunBullet,
+    AK47,
 }
 
 /**

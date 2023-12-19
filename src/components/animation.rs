@@ -21,7 +21,7 @@ use super::Object2D;
 *
 * Seperate timer for each animatable object
 */
-#[derive(Deref, DerefMut)]
+#[derive(Clone, Deref, DerefMut)]
 pub struct AnimationTimer(pub Timer);
 
 impl Default for AnimationTimer {
@@ -47,7 +47,7 @@ impl AnimationTimer {
 * Sets the direction of the animation
 * Default is `Right``
 */
-#[derive(Component, Default, Deref, DerefMut)]
+#[derive(Clone, Component, Default, Deref, DerefMut)]
 pub struct Direction(pub EgocentricDirection);
 
 /**
@@ -55,7 +55,7 @@ pub struct Direction(pub EgocentricDirection);
  *
  * Base bundle for any animated objects in the world
  */
-#[derive(Bundle, Default)]
+#[derive(Clone, Bundle, Default)]
 pub struct Animated2DObjectBundle {
     pub sprite_sheet_bundle: SpriteSheetBundle,
 
@@ -66,7 +66,7 @@ pub struct Animated2DObjectBundle {
     pub animator: Animator,
 }
 
-#[derive(Component, Default)]
+#[derive(Clone, Component, Default)]
 pub struct Animator {
     pub current_animation: EntityState,
     pub animations: HashMap<EntityState, Animation>,
@@ -109,7 +109,7 @@ impl Animator {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Animation {
     pub name: EntityState,
     pub first: usize,

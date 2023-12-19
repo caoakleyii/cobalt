@@ -42,9 +42,9 @@ fn main() {
 }
 
 fn register_server_asset_systems(app: &mut App) {
-    app.add_asset::<TextAsset>();
+    app.init_asset::<TextAsset>();
+    app.init_asset::<Image>();
     app.init_asset_loader::<TextLoader>();
-
     app.add_systems(Startup, asset_config_loader_sytem);
     app.add_systems(
         Update,
@@ -63,11 +63,12 @@ fn build_server_and_network_systems(app: &mut App) {
     let server_config = ServerConfig {
         max_clients: 64,
         protocol_id: PROTOCOL_ID,
-        public_addr: std::net::SocketAddr::V4(public_addr),
+        current_time,
+        public_addresses: vec![std::net::SocketAddr::V4(public_addr)],
         authentication: ServerAuthentication::Unsecure,
     };
 
-    let transport = NetcodeServerTransport::new(current_time, server_config, socket).unwrap();
+    let transport = NetcodeServerTransport::new(server_config, socket).unwrap();
     app.insert_resource(server);
     app.insert_resource(transport);
     app.insert_resource(ServerLobby::default());

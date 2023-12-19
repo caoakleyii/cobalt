@@ -11,5 +11,6 @@ use crate::enums::EntityState;
 pub struct NetworkedEntities {
     pub entities: Vec<Entity>,
     pub translations: Vec<[f32; 3]>,
+    pub aim_ats: Vec<[f32; 2]>,
     pub states: Vec<EntityState>,
 }

@@ -1,12 +1,11 @@
 use bevy::{
-    prelude::{Bundle, Component, Handle, Transform},
+    prelude::{Bundle, Component, Deref, Handle, Transform, Vec2},
     sprite::{SpriteSheetBundle, TextureAtlas},
 };
-
-use crate::resources::ClientId;
+use bevy_renet::renet::ClientId;
 
 use super::{
-    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, KineticBodyBundle,
+    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, Health, KineticBodyBundle,
     NetworkedEntityBundle, Object2DBundle,
 };
 
@@ -15,9 +14,17 @@ use super::{
  *
  * Component stating an entity is a player
  */
-#[derive(Component, Debug, Default)]
+#[derive(Component, Debug)]
 pub struct Player {
     pub id: ClientId,
+}
+
+impl Default for Player {
+    fn default() -> Self {
+        Self {
+            id: ClientId::from_raw(0),
+        }
+    }
 }
 
 /**
@@ -37,6 +44,14 @@ pub struct Controllable;
 pub struct PlayerCamera;
 
 /**
+ * Aim
+ *
+ * The world position of the player's aim
+ */
+#[derive(Component, Deref, Default)]
+pub struct Aim(pub Vec2);
+
+/**
  * Player Bundle
  *
  * Contains a player component, kinetic body bundle
@@ -45,6 +60,10 @@ pub struct PlayerCamera;
 #[derive(Bundle, Default)]
 pub struct PlayerBundle {
     pub player: Player,
+
+    pub health: Health,
+
+    pub aim: Aim,
 
     pub kinetic_body: AnimatedKineticBodyBundle,
 
