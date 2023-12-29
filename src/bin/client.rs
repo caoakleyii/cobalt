@@ -2,6 +2,7 @@ use std::net::UdpSocket;
 use std::time::SystemTime;
 
 use bevy::prelude::*;
+use bevy_2d_collisions::CollisionsPlugin;
 use bevy_health_bar::ProgressBarPlugin;
 use bevy_renet::{
     client_connected,
@@ -28,8 +29,8 @@ use utils::{
         asset_loader_state_system, asset_loader_system, capture_player_command_input_system,
         capture_player_input_system, client_send_player_command_events,
         client_send_player_input_system, handle_input, networking::client_update_system,
-        player_create_system, player_remove_system, spawn_projectile, sync_animation_state,
-        tick_equipment_system,
+        player_despawn, player_spawn, projectile_collisions, spawn_projectile,
+        sync_animation_state, tick_equipment_system,
     },
 };
 
@@ -41,6 +42,7 @@ fn main() {
         RenetClientPlugin,
         NetcodeClientPlugin,
         ProgressBarPlugin,
+        CollisionsPlugin,
     ));
 
     app.add_state::<GameState>();
@@ -123,8 +125,8 @@ fn register_network_events(app: &mut App) {
     app.add_systems(
         Update,
         (
-            player_create_system,
-            player_remove_system,
+            player_spawn,
+            player_despawn,
             client_send_player_command_events,
         )
             .in_set(Connected),
@@ -153,6 +155,7 @@ fn reigster_game_systems(app: &mut App) {
             apply_velocity,
             spawn_projectile,
             apply_direction,
+            projectile_collisions,
         )
             .in_set(Connected),
     );

@@ -1,7 +1,9 @@
 use bevy::{
+    math::Vec2,
     prelude::{Bundle, Component, Handle, Transform},
     sprite::{SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
 };
+use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 
 use super::{
     Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, KineticBodyBundle, Object2DBundle,
@@ -24,6 +26,8 @@ impl ProjectileBundle {
         texture_atlas: Handle<TextureAtlas>,
         transform: Transform,
         velocity: Velocity,
+        size: Vec2,
+        collision_group: CollisionGroup,
     ) -> Self {
         let mut animator = animator;
         let sprite = TextureAtlasSprite {
@@ -45,6 +49,14 @@ impl ProjectileBundle {
                     },
                     ..Default::default()
                 },
+                collision_bundle: CollisionBundle {
+                    collision_box: CollisionBox {
+                        size,
+                        ..Default::default()
+                    },
+                    collision_group,
+                    ..Default::default()
+                },
             },
         }
     }
@@ -58,7 +70,12 @@ pub struct ServerProjectileBundle {
 }
 
 impl ServerProjectileBundle {
-    pub fn new(transform: Transform, velocity: Velocity) -> Self {
+    pub fn new(
+        transform: Transform,
+        velocity: Velocity,
+        size: Vec2,
+        collision_group: CollisionGroup,
+    ) -> Self {
         Self {
             projectile: Projectile,
             kinetic_body: KineticBodyBundle {
@@ -67,6 +84,14 @@ impl ServerProjectileBundle {
                     ..Default::default()
                 },
                 velocity,
+                collision_bundle: CollisionBundle {
+                    collision_box: CollisionBox {
+                        size,
+                        ..Default::default()
+                    },
+                    collision_group,
+                    ..Default::default()
+                },
             },
         }
     }

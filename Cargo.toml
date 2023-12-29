@@ -19,7 +19,8 @@ path = "src/bin/server.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.12.0", features = ["dynamic_linking"] }
+bevy = { version = "0.12.1", features = ["dynamic_linking"] }
+bevy_2d_collisions = "0.2.0"
 bevy_common_assets = "0.7.0"
 bevy_health_bar = "0.1.0"
 bevy_renet = { version = "0.0.10", features = ["transport"] }

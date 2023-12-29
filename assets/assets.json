@@ -33,7 +33,13 @@
                         "is_default": false,
                         "frame_speed": 0.1
                     }
-                ]
+                ],
+                "hitbox": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 17,
+                    "height": 20
+                }
             },
             "Bullet": {
                 "name": "Bullet",
@@ -51,7 +57,13 @@
                         "is_default": true,
                         "frame_speed": 0.1
                     }
-                ]
+                ],
+                "hitbox": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 13,
+                    "height": 9
+                }
             },
             "SmgBullet": {
                 "name": "SmgBullet",
@@ -91,7 +103,7 @@
             },
             "AK47": {
                 "name": "AK47",
-                "path": "equipment/smgs.png",
+                "path": "equipment/weapons.png",
                 "width": 96.0,
                 "height": 32.0,
                 "columns": 4,
@@ -127,18 +139,21 @@
     },
     "stats": {
         "equipment": {
-            "Rifle": {
-                "name": "Rifle",
+            "AK47": {
+                "name": "AK47",
                 "magazine": 27,
                 "max_magazine": 27,
                 "fire_rate": 0.2,
                 "reload_time": 1.0,
                 "damage": 10,
                 "spray": 0.3,
+                "projectile_type": "Bullet",
                 "projectile_speed": 900.0,
                 "projectile_size": 900.0,
                 "projectile_per_shot": 1,
-                "range": 1000
+                "range": 1000,
+                "layers": ["Projectile"],
+                "masks": ["Enemy"]
             },
             "Smg": {
                 "name": "Smg",
@@ -148,10 +163,13 @@
                 "reload_time": 0.6,
                 "damage": 2,
                 "spray": 0.5,
+                "projectile_type": "SmgBullet",
                 "projectile_speed": 10.0,
                 "projectile_size": 1.0,
                 "projectile_per_shot": 1,
-                "range": 500
+                "range": 500,
+                "layers": ["Projectile"],
+                "masks": ["Enemy"]
             },
             "Shotgun":{
                 "name": "Shotgun",
@@ -161,10 +179,13 @@
                 "reload_time": 1.0,
                 "damage": 10,
                 "spray": 0.8,
+                "projectile_type": "ShotgunBullet",
                 "projectile_speed": 10.0,
                 "projectile_size": 1.0,
                 "projectile_per_shot": 5,
-                "range": 500
+                "range": 500,
+                "layers": ["Projectile"],
+                "masks": ["Enemy"]
             }
     
         }

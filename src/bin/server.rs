@@ -2,22 +2,23 @@ use std::time::Duration;
 use std::{net::UdpSocket, time::SystemTime};
 
 use bevy::prelude::*;
+use bevy_2d_collisions::CollisionsPlugin;
 use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication, ServerConfig};
 use bevy_renet::renet::RenetServer;
 use bevy_renet::{transport::NetcodeServerPlugin, RenetServerPlugin};
 use utils::enums::GameState;
 use utils::events::{
     ClientConnectedEvent, ClientDisconnectedEvent, EquippedUse, PlayerCommandEvent,
-    PlayerInputEvent,
+    PlayerInputEvent, SpawnProjectileEvent,
 };
 use utils::networking::{connection_config, PROTOCOL_ID};
 use utils::resources::{ServerLobby, TextAsset, TextLoader};
 use utils::systems::networking::server::server_update_system;
 use utils::systems::{
-    apply_velocity, asset_config_loader_sytem, asset_loader_system,
-    client_connected_to_server_system, client_disconnected_system, equipment_use_system,
-    handle_input, server_network_sync, server_receive_player_command_system,
-    server_receive_player_input_system, tick_equipment_system,
+    apply_velocity, asset_config_loader_sytem, asset_loader_system, client_connected_to_server,
+    client_disconnected, equipment_use_system, handle_input, projectile_collisions,
+    server_network_sync, server_receive_player_command_system, server_receive_player_input_system,
+    spawn_projectile_server, tick_equipment_system,
 };
 
 fn main() {
@@ -28,6 +29,7 @@ fn main() {
         AssetPlugin::default(),
         RenetServerPlugin,
         NetcodeServerPlugin,
+        CollisionsPlugin,
     ));
 
     app.add_state::<GameState>();
@@ -85,19 +87,22 @@ fn register_network_events(app: &mut App) {
     app.add_event::<PlayerInputEvent>();
     app.add_event::<PlayerCommandEvent>();
     app.add_event::<EquippedUse>();
+    app.add_event::<SpawnProjectileEvent>();
 
     app.add_systems(
         Update,
         (
-            client_connected_to_server_system,
-            client_disconnected_system,
+            client_connected_to_server,
+            client_disconnected,
             server_receive_player_input_system,
             server_network_sync,
             handle_input,
             server_receive_player_command_system,
             tick_equipment_system,
             equipment_use_system,
+            spawn_projectile_server,
             apply_velocity,
+            projectile_collisions,
         )
             .run_if(in_state(GameState::Gameloop)),
     );

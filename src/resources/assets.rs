@@ -9,14 +9,14 @@ use bevy::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::enums::{EntityState, Equipment, Sprites};
+use crate::enums::{CollisionGroups, EntityState, Equipment, Sprites};
 
 #[derive(Resource, Default, Deref)]
 pub struct AssetLoading(pub u32);
 
 #[derive(Resource, Default)]
 pub struct AssetHandler {
-    pub textures: HashMap<Sprites, (TextureAtlas, Vec<AnimationConfig>)>,
+    pub textures: HashMap<Sprites, (TextureAtlas, Vec<AnimationConfig>, Option<HitboxConfig>)>,
 }
 
 #[derive(Resource, Serialize, Deserialize)]
@@ -31,7 +31,7 @@ pub struct SpritesConfig {
     pub textures: HashMap<Sprites, SpriteConfig>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SpriteConfig {
     pub name: Sprites,
     pub path: String,
@@ -40,9 +40,10 @@ pub struct SpriteConfig {
     pub columns: i32,
     pub rows: i32,
     pub animations: Vec<AnimationConfig>,
+    pub hitbox: Option<HitboxConfig>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AnimationConfig {
     pub name: EntityState,
     pub start_index: i32,
@@ -50,6 +51,14 @@ pub struct AnimationConfig {
     pub should_loop: bool,
     pub is_default: bool,
     pub frame_speed: f32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+pub struct HitboxConfig {
+    pub width: f32,
+    pub height: f32,
+    pub x: f32,
+    pub y: f32,
 }
 
 // TEXT ASSET
@@ -95,11 +104,11 @@ impl AssetLoader for TextLoader {
 // STATS CONFIG
 #[derive(Serialize, Deserialize)]
 pub struct StatsConfig {
-    pub equipment: HashMap<Equipment, EquipmentStats>,
+    pub equipment: HashMap<Equipment, EquipmentStatsConfig>,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct EquipmentStats {
+pub struct EquipmentStatsConfig {
     pub name: Equipment,
     pub magazine: u32,
     pub max_magazine: u32,
@@ -107,8 +116,11 @@ pub struct EquipmentStats {
     pub reload_time: f32,
     pub damage: u32,
     pub spray: f32,
+    pub projectile_type: Sprites,
     pub projectile_speed: f32,
     pub projectile_size: f32,
     pub projectile_per_shot: u32,
     pub range: u32,
+    pub layers: Vec<CollisionGroups>,
+    pub masks: Vec<CollisionGroups>,
 }

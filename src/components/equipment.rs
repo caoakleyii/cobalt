@@ -1,10 +1,13 @@
 use bevy::{
     prelude::{Bundle, Component, Handle, Transform, Vec2, Vec3},
-    sprite::{SpriteSheetBundle, TextureAtlas},
+    sprite::{Sprite, SpriteSheetBundle, TextureAtlas},
     time::{Timer, TimerMode},
 };
 
-use crate::{enums::Equipment as EquipmentType, resources::EquipmentStats};
+use crate::{
+    enums::{Equipment as EquipmentType, Sprites},
+    resources::EquipmentStatsConfig,
+};
 
 use super::{Animated2DObjectBundle, Animator, Speed, Velocity};
 
@@ -66,16 +69,19 @@ pub struct Equipment {
     pub reload_time: f32,
     pub damage: u32,
     pub spray: f32,
+    pub projectile_type: Sprites,
     pub projectile_speed: f32,
     pub projectile_size: f32,
     pub projectile_per_shot: u32,
+    pub layer: u32,
+    pub mask: u32,
     pub range: u32,
     pub fire_rate_timer: Timer,
     pub reload_timer: Timer,
 }
 
-impl From<&EquipmentStats> for Equipment {
-    fn from(value: &EquipmentStats) -> Self {
+impl From<&EquipmentStatsConfig> for Equipment {
+    fn from(value: &EquipmentStatsConfig) -> Self {
         Self {
             equipment_type: value.name,
             magazine: value.magazine,
@@ -84,10 +90,13 @@ impl From<&EquipmentStats> for Equipment {
             reload_time: value.reload_time,
             damage: value.damage,
             spray: value.spray,
+            projectile_type: value.projectile_type,
             range: value.range,
             projectile_speed: value.projectile_speed,
             projectile_size: value.projectile_size,
             projectile_per_shot: value.projectile_per_shot,
+            layer: value.layers.iter().fold(0, |acc, x| acc | *x as u32),
+            mask: value.masks.iter().fold(0, |acc, x| acc | *x as u32),
             fire_rate_timer: Timer::from_seconds(value.fire_rate, TimerMode::Once),
             reload_timer: Timer::from_seconds(value.reload_time, TimerMode::Once),
         }

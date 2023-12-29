@@ -1,14 +1,15 @@
 use bevy::prelude::*;
 use bevy::sprite::TextureAtlas;
+use bevy_2d_collisions::components::CollisionGroup;
 use bevy_health_bar::ProgressBarBundle;
 use bevy_renet::renet::RenetServer;
 use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
 
 use crate::components::{
     Animator, Controllable, EquipmentBundle, Player, PlayerBundle, PlayerCamera,
-    ServerEquipmentBundle, ServerPlayerBundle,
+    ServerEquipmentBundle, ServerPlayerBundle, Team,
 };
-use crate::enums::{Equipment, ServerMessages, Sprites};
+use crate::enums::{CollisionGroups, Equipment, ServerMessages, Sprites};
 use crate::events::{
     ClientConnectedEvent, ClientDisconnectedEvent, PlayerCreateEvent, PlayerRemoveEvent,
 };
@@ -18,7 +19,7 @@ use crate::resources::{
     PlayerInfo, ServerLobby,
 };
 
-pub fn player_create_system(
+pub fn player_spawn(
     mut commands: Commands,
     mut reader_player_create: EventReader<PlayerCreateEvent>,
     mut lobby: ResMut<ClientLobby>,
@@ -41,11 +42,17 @@ pub fn player_create_system(
             commands.spawn((camera_bundle, PlayerCamera));
         }
 
+        let character_type = Sprites::Skeleton;
         // Retrieve character assets from the already loaded resources
-        let (texture, animations) = asset_handler
+        let (texture, animations, hitbox_config) = asset_handler
             .textures
-            .get(&Sprites::Skeleton)
+            .get(&character_type)
             .expect("unexpected character requested.");
+
+        let hitbox_config = hitbox_config.expect(&format!(
+            "Requested character does not have a hitbox: {:?}",
+            character_type
+        ));
 
         // Spawn Player
         let mut player_entity = commands.spawn(PlayerBundle::new(
@@ -57,6 +64,11 @@ pub fn player_create_system(
                 player_create_event.translation[1],
                 player_create_event.translation[2],
             ),
+            Vec2::new(hitbox_config.width, hitbox_config.height),
+            CollisionGroup {
+                layer: CollisionGroups::Player as u32 | player_create_event.team,
+                mask: CollisionGroups::Projectile as u32,
+            },
         ));
 
         // if this is the client player, give them control
@@ -80,7 +92,7 @@ pub fn player_create_system(
         let player_entity = player_entity.id();
 
         // Retrieve character assets from the already loaded resources
-        let (texture, animations) = asset_handler
+        let (texture, animations, hitbox_config) = asset_handler
             .textures
             .get(&Sprites::AK47)
             .expect("unexpected character requested.");
@@ -91,8 +103,8 @@ pub fn player_create_system(
                 asset_config
                     .stats
                     .equipment
-                    .get(&Equipment::Rifle)
-                    .expect("Could not find rifle in equipment config.")
+                    .get(&Equipment::AK47)
+                    .expect("Could not find AK47 in equipment config.")
                     .into(),
                 Animator::import(animations),
                 texture_atlases.add(texture.clone()),
@@ -111,7 +123,7 @@ pub fn player_create_system(
     }
 }
 
-pub fn player_remove_system(
+pub fn player_despawn(
     mut commands: Commands,
     mut reader_player_remove: EventReader<PlayerRemoveEvent>,
     mut lobby: ResMut<ClientLobby>,
@@ -127,13 +139,14 @@ pub fn player_remove_system(
     }
 }
 
-pub fn client_connected_to_server_system(
+pub fn client_connected_to_server(
     mut commands: Commands,
     mut reader_client_connected: EventReader<ClientConnectedEvent>,
     mut lobby: ResMut<ServerLobby>,
     mut server: ResMut<RenetServer>,
+    asset_handler: Res<AssetHandler>,
     asset_config: Res<AssetsConfig>,
-    players: Query<(Entity, &Player, &Transform)>,
+    players: Query<(Entity, &Player, &Transform, &Team)>,
 ) {
     for client_connected in reader_client_connected.read() {
         match client_connected.0 {
@@ -141,32 +154,60 @@ pub fn client_connected_to_server_system(
                 println!("Player {} connected.", client_id);
 
                 // initialize the newly connected client with the current state of the players in the game
-                for (entity, player, transform) in &players {
+                for (entity, player, transform, p_team) in &players {
                     let translation: [f32; 3] = transform.translation.into();
                     let message =
                         bincode::serialize(&ServerMessages::PlayerCreate(PlayerCreateEvent {
                             id: ClientId(player.id.raw()),
                             entity,
                             translation,
+                            team: (**p_team).into(),
                         }))
                         .unwrap();
                     server.send_message(client_id, ServerChannel::ServerMessages, message);
                 }
 
                 // spawn the player on the server
+
+                let character_type = Sprites::Skeleton;
+                // Retrieve character assets from the already loaded resources
+                let (_texture, _animations, hitbox_config) = asset_handler
+                    .textures
+                    .get(&character_type)
+                    .expect("unexpected character requested.");
+
+                let hitbox_config = hitbox_config.expect(&format!(
+                    "Requested character does not have a hitbox: {:?}",
+                    character_type
+                ));
+
+                // TODO: Change this, curently just auto balancing teams
+                let team = if lobby.players.len() % 2 == 0 {
+                    CollisionGroups::TeamAlpha as u32
+                } else {
+                    CollisionGroups::TeamBravo as u32
+                };
+                println!("Team: {}", team);
+
                 let spawn_point = Vec3::new(0.0, 0.0, 0.0);
                 let player_entity = commands
                     .spawn(ServerPlayerBundle::new(
                         client_id,
                         Transform::from_translation(spawn_point.clone()),
+                        Vec2::new(hitbox_config.width, hitbox_config.height),
+                        CollisionGroup {
+                            layer: team,
+                            mask: CollisionGroups::Projectile as u32,
+                        },
+                        Team(team.into()),
                     ))
                     .with_children(|parent| {
                         parent.spawn(ServerEquipmentBundle::new(
                             asset_config
                                 .stats
                                 .equipment
-                                .get(&Equipment::Rifle)
-                                .expect("Could not find rifle in equipment config.")
+                                .get(&Equipment::AK47)
+                                .expect("Could not find AK47 in equipment config.")
                                 .into(),
                         ));
                     })
@@ -174,12 +215,13 @@ pub fn client_connected_to_server_system(
 
                 lobby.players.insert(client_id.raw(), player_entity);
 
-                // send the player entity to the client
+                // send the player entity to the clients
                 let message =
                     bincode::serialize(&ServerMessages::PlayerCreate(PlayerCreateEvent {
                         id: ClientId(client_id.raw()),
                         entity: player_entity,
                         translation: spawn_point.to_array(),
+                        team,
                     }))
                     .unwrap();
                 server.broadcast_message(ServerChannel::ServerMessages, message);
@@ -189,7 +231,7 @@ pub fn client_connected_to_server_system(
     }
 }
 
-pub fn client_disconnected_system(
+pub fn client_disconnected(
     mut commands: Commands,
     mut reader_client_disconnected: EventReader<ClientDisconnectedEvent>,
     mut lobby: ResMut<ServerLobby>,
