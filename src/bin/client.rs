@@ -2,6 +2,7 @@ use std::net::UdpSocket;
 use std::time::SystemTime;
 
 use bevy::prelude::*;
+use bevy_2d_collisions::CollisionsPlugin;
 use bevy_health_bar::ProgressBarPlugin;
 use bevy_renet::{
     client_connected,
@@ -13,6 +14,8 @@ use bevy_renet::{
     RenetClientPlugin,
 };
 
+use utils::events::DamageEntityEvent;
+use utils::systems::on_damage_entity;
 use utils::{
     enums::GameState,
     events::{
@@ -27,9 +30,9 @@ use utils::{
         animate_sprites, apply_direction, apply_velocity, asset_config_loader_sytem,
         asset_loader_state_system, asset_loader_system, capture_player_command_input_system,
         capture_player_input_system, client_send_player_command_events,
-        client_send_player_input_system, handle_input, networking::client_update_system,
-        player_create_system, player_remove_system, spawn_projectile, sync_animation_state,
-        tick_equipment_system,
+        client_send_player_input_system, handle_input, health_bar_update,
+        networking::client_update_system, player_despawn, player_spawn, spawn_projectile,
+        sync_animation_state, tick_equipment_system,
     },
 };
 
@@ -41,6 +44,7 @@ fn main() {
         RenetClientPlugin,
         NetcodeClientPlugin,
         ProgressBarPlugin,
+        CollisionsPlugin,
     ));
 
     app.add_state::<GameState>();
@@ -75,7 +79,8 @@ fn connect_client_and_network_systems(app: &mut App) {
     let client = RenetClient::new(connection_config());
 
     let server_addr = "127.0.0.1:5000".parse().unwrap();
-    let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+    // let server_addr = "138.197.16.199:5000".parse().unwrap();
+    let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
     let current_time = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap();
@@ -100,7 +105,7 @@ fn connect_client_and_network_systems(app: &mut App) {
     // If any error is found we just panic
     fn panic_on_error_system(mut renet_error: EventReader<NetcodeTransportError>) {
         for e in renet_error.read() {
-            panic!("{}", e);
+            panic!("{:?}", e);
         }
     }
 
@@ -119,12 +124,13 @@ fn register_network_events(app: &mut App) {
     app.add_event::<PlayerCreateEvent>();
     app.add_event::<PlayerRemoveEvent>();
     app.add_event::<SpawnProjectileEvent>();
+    app.add_event::<DamageEntityEvent>();
 
     app.add_systems(
         Update,
         (
-            player_create_system,
-            player_remove_system,
+            player_spawn,
+            player_despawn,
             client_send_player_command_events,
         )
             .in_set(Connected),
@@ -153,6 +159,8 @@ fn reigster_game_systems(app: &mut App) {
             apply_velocity,
             spawn_projectile,
             apply_direction,
+            on_damage_entity,
+            health_bar_update,
         )
             .in_set(Connected),
     );

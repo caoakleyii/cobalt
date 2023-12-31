@@ -1,4 +1,5 @@
 use bevy::prelude::{Bundle, Component, Deref, DerefMut, Vec2};
+use bevy_2d_collisions::components::CollisionBundle;
 
 use super::{Animated2DObjectBundle, Object2DBundle};
 
@@ -23,10 +24,19 @@ impl Default for Speed {
  *
  * Component to define the health of an object
  */
-#[derive(Component, Default, Debug)]
+#[derive(Component, Debug)]
 pub struct Health {
     pub current: f32,
     pub max: f32,
+}
+
+impl Default for Health {
+    fn default() -> Self {
+        Self {
+            current: 100.0,
+            max: 100.0,
+        }
+    }
 }
 
 /**
@@ -60,8 +70,6 @@ impl From<[f32; 2]> for Velocity {
     }
 }
 
-// ! TODO: Define or use a bevy/library hitbox bundle
-
 /**
  * Kinetic Body
  *
@@ -73,6 +81,8 @@ pub struct KineticBodyBundle {
     pub velocity: Velocity,
 
     pub object_2d_bundle: Object2DBundle,
+
+    pub collision_bundle: CollisionBundle,
 }
 
 /**
@@ -85,6 +95,8 @@ pub struct AnimatedKineticBodyBundle {
     pub velocity: Velocity,
 
     pub animated_2d_object: Animated2DObjectBundle,
+
+    pub collision_bundle: CollisionBundle,
 }
 
 /**
@@ -96,6 +108,8 @@ pub struct AnimatedKineticBodyBundle {
 #[derive(Bundle, Default)]
 pub struct StaticBodyBundle {
     pub object_2d_bundle: Object2DBundle,
+
+    pub collision_bundle: CollisionBundle,
 }
 
 /**
@@ -106,4 +120,6 @@ pub struct StaticBodyBundle {
 #[derive(Bundle, Default)]
 pub struct AnimatedStaticBodyBundle {
     pub animated_2d_object: Animated2DObjectBundle,
+
+    pub collision_bundle: CollisionBundle,
 }

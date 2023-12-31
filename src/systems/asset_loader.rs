@@ -41,19 +41,25 @@ pub fn asset_loader_system(
             .sprites
             .textures
             .iter()
-            .for_each(|(key, char_config)| {
-                let image_handle: Handle<Image> = asset_server.load(char_config.path.clone());
+            .for_each(|(key, sprite_config)| {
+                let image_handle: Handle<Image> = asset_server.load(sprite_config.path.clone());
 
                 let texture_atlas = TextureAtlas::from_grid(
                     image_handle,
-                    Vec2::new(char_config.width, char_config.height),
-                    char_config.columns as usize,
-                    char_config.rows as usize,
+                    Vec2::new(sprite_config.width, sprite_config.height),
+                    sprite_config.columns as usize,
+                    sprite_config.rows as usize,
                     None,
                     None,
                 );
-                character_handles
-                    .insert(key.clone(), (texture_atlas, char_config.animations.clone()));
+                character_handles.insert(
+                    key.clone(),
+                    (
+                        texture_atlas,
+                        sprite_config.animations.clone(),
+                        sprite_config.hitbox,
+                    ),
+                );
             });
 
         let asset_handler = AssetHandler {

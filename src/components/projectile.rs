@@ -1,11 +1,13 @@
 use bevy::{
+    math::Vec2,
     prelude::{Bundle, Component, Handle, Transform},
     sprite::{SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
 };
+use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 
 use super::{
-    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, KineticBodyBundle, Object2DBundle,
-    Velocity,
+    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, Damage, KineticBodyBundle,
+    Object2DBundle, Velocity,
 };
 
 #[derive(Component, Debug, Default)]
@@ -16,6 +18,8 @@ pub struct ProjectileBundle {
     pub projectile: Projectile,
 
     pub kinetic_body: AnimatedKineticBodyBundle,
+
+    pub damage: Damage,
 }
 
 impl ProjectileBundle {
@@ -24,6 +28,8 @@ impl ProjectileBundle {
         texture_atlas: Handle<TextureAtlas>,
         transform: Transform,
         velocity: Velocity,
+        size: Vec2,
+        collision_group: CollisionGroup,
     ) -> Self {
         let mut animator = animator;
         let sprite = TextureAtlasSprite {
@@ -45,7 +51,16 @@ impl ProjectileBundle {
                     },
                     ..Default::default()
                 },
+                collision_bundle: CollisionBundle {
+                    collision_box: CollisionBox {
+                        size,
+                        ..Default::default()
+                    },
+                    collision_group,
+                    ..Default::default()
+                },
             },
+            ..Default::default()
         }
     }
 }
@@ -55,10 +70,17 @@ pub struct ServerProjectileBundle {
     pub projectile: Projectile,
 
     pub kinetic_body: KineticBodyBundle,
+
+    pub damage: Damage,
 }
 
 impl ServerProjectileBundle {
-    pub fn new(transform: Transform, velocity: Velocity) -> Self {
+    pub fn new(
+        transform: Transform,
+        velocity: Velocity,
+        size: Vec2,
+        collision_group: CollisionGroup,
+    ) -> Self {
         Self {
             projectile: Projectile,
             kinetic_body: KineticBodyBundle {
@@ -67,7 +89,16 @@ impl ServerProjectileBundle {
                     ..Default::default()
                 },
                 velocity,
+                collision_bundle: CollisionBundle {
+                    collision_box: CollisionBox {
+                        size,
+                        ..Default::default()
+                    },
+                    collision_group,
+                    ..Default::default()
+                },
             },
+            ..Default::default()
         }
     }
 }
