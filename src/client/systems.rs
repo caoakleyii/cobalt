@@ -3,15 +3,15 @@ use bevy_renet::renet::RenetClient;
 
 use crate::{
     components::Aim,
-    enums::ServerMessages,
-    events::{DamageEntityEvent, PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent},
-    networking::{NetworkedEntities, ServerChannel},
-    resources::NetworkEntities,
+    events::{CreatePlayerEvent, DamageEntityEvent, RemovePlayerEvent, SpawnProjectileEvent},
+    networking::{networking::ServerMessages, NetworkedEntities, ServerChannel},
 };
 
+use super::resources::NetworkEntities;
+
 pub fn client_update_system(
-    mut writer_player_create: EventWriter<PlayerCreateEvent>,
-    mut writer_player_remove: EventWriter<PlayerRemoveEvent>,
+    mut writer_player_create: EventWriter<CreatePlayerEvent>,
+    mut writer_player_remove: EventWriter<RemovePlayerEvent>,
     mut writer_spawn_projectile: EventWriter<SpawnProjectileEvent>,
     mut writer_damage_entity: EventWriter<DamageEntityEvent>,
     mut client: ResMut<RenetClient>,

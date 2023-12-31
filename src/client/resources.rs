@@ -1,15 +1,7 @@
 use std::collections::HashMap;
 
-use bevy::prelude::{Deref, Entity, Resource, SystemSet};
+use bevy::prelude::{Deref, Entity, Resource};
 use serde::{Deserialize, Serialize};
-
-/// A System Set that runs when a client is connected
-///
-/// Determined by the following renet functions
-/// bevy_renet::transport::client_connected()
-/// bevy_renet::steam::client_disconnected(
-#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Connected;
 
 /// A struct that holds a client id
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Deref)]

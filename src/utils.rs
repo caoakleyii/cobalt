@@ -1,3 +1,4 @@
+pub mod client;
 pub mod components;
 pub mod enums;
 pub mod events;

@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 pub mod config;
 pub use self::config::*;
 
@@ -9,3 +11,11 @@ pub use self::server_channel::*;
 
 pub mod models;
 pub use self::models::*;
+
+pub mod networking;
+
+pub struct NetworkingPlugin;
+
+impl Plugin for NetworkingPlugin {
+    fn build(&self, _app: &mut App) {}
+}

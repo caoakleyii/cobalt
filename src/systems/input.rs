@@ -2,12 +2,13 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_renet::renet::RenetClient;
 
+use crate::client::resources::{ClientId, ClientLobby, CurrentClientId};
 use crate::components::{Controllable, Equipped, Player, PlayerCamera, Velocity};
 
 use crate::enums::EntityState;
 use crate::events::{EquippedUse, PlayerCommand, PlayerCommandEvent, PlayerInputEvent};
 use crate::networking::ClientChannel;
-use crate::resources::{ClientId, ClientLobby, CurrentClientId, PlayerInput, ServerLobby};
+use crate::resources::{PlayerInput, ServerLobby};
 
 pub fn capture_player_input_system(
     mut player_input: ResMut<PlayerInput>,

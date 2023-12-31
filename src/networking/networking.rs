@@ -2,7 +2,7 @@ use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 
 use crate::events::{
-    DamageEntityEvent, PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent,
+    CreatePlayerEvent, DamageEntityEvent, RemovePlayerEvent, SpawnProjectileEvent,
 };
 
 /**
@@ -12,8 +12,8 @@ use crate::events::{
  */
 #[derive(Debug, Serialize, Deserialize, Component)]
 pub enum ServerMessages {
-    PlayerCreate(PlayerCreateEvent),
-    PlayerRemove(PlayerRemoveEvent),
+    PlayerCreate(CreatePlayerEvent),
+    PlayerRemove(RemovePlayerEvent),
     SpawnProjectile(SpawnProjectileEvent),
     DamageEntity(DamageEntityEvent),
     // DespawnProjectile {

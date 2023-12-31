@@ -9,14 +9,15 @@ use bevy_health_bar::ProgressBar;
 use bevy_renet::renet::RenetServer;
 
 use crate::{
+    client::resources::NetworkEntities,
     components::{
         projectile::ProjectileBundle, Animator, Damage, Equipped, Health, ServerProjectileBundle,
         Team, Velocity,
     },
-    enums::{CollisionGroups, ServerMessages},
+    enums::CollisionGroups,
     events::{DamageEntityEvent, EquippedUse, SpawnProjectileEvent},
-    networking::ServerChannel,
-    resources::{AssetHandler, NetworkEntities},
+    networking::{networking::ServerMessages, ServerChannel},
+    resources::AssetHandler,
 };
 
 pub fn equipment_use_system(

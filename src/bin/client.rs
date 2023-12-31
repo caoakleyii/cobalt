@@ -1,38 +1,24 @@
-use std::net::UdpSocket;
-use std::time::SystemTime;
-
 use bevy::prelude::*;
 use bevy_2d_collisions::CollisionsPlugin;
 use bevy_health_bar::ProgressBarPlugin;
-use bevy_renet::{
-    client_connected,
-    renet::{
-        transport::{ClientAuthentication, NetcodeClientTransport, NetcodeTransportError},
-        RenetClient,
-    },
-    transport::NetcodeClientPlugin,
-    RenetClientPlugin,
-};
+use bevy_renet::{transport::NetcodeClientPlugin, RenetClientPlugin};
 
+use utils::client::sets::Connected;
+use utils::client::ClientPlugin;
 use utils::events::DamageEntityEvent;
 use utils::systems::on_damage_entity;
 use utils::{
     enums::GameState,
     events::{
-        EquippedUse, PlayerCommand, PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent,
+        CreatePlayerEvent, EquippedUse, PlayerCommand, RemovePlayerEvent, SpawnProjectileEvent,
     },
-    networking::{connection_config, PROTOCOL_ID},
-    resources::{
-        AssetLoading, ClientLobby, Connected, CurrentClientId, NetworkEntities, PlayerInput,
-        TextAsset, TextLoader,
-    },
+    resources::{AssetLoading, PlayerInput, TextAsset, TextLoader},
     systems::{
         animate_sprites, apply_direction, apply_velocity, asset_config_loader_sytem,
         asset_loader_state_system, asset_loader_system, capture_player_command_input_system,
         capture_player_input_system, client_send_player_command_events,
-        client_send_player_input_system, handle_input, health_bar_update,
-        networking::client_update_system, player_despawn, player_spawn, spawn_projectile,
-        sync_animation_state, tick_equipment_system,
+        client_send_player_input_system, create_player, handle_input, health_bar_update,
+        player_despawn, spawn_projectile, sync_animation_state, tick_equipment_system,
     },
 };
 
@@ -43,6 +29,7 @@ fn main() {
         DefaultPlugins,
         RenetClientPlugin,
         NetcodeClientPlugin,
+        ClientPlugin,
         ProgressBarPlugin,
         CollisionsPlugin,
     ));
@@ -50,8 +37,6 @@ fn main() {
     app.add_state::<GameState>();
 
     register_client_asset_systems(&mut app);
-
-    connect_client_and_network_systems(&mut app);
 
     register_network_events(&mut app);
 
@@ -72,64 +57,17 @@ fn register_client_asset_systems(app: &mut App) {
 
     app.add_systems(Update, (animate_sprites, asset_loader_state_system));
 }
-
-/// Connnect to the server
-/// and add any required resources, and systems.
-fn connect_client_and_network_systems(app: &mut App) {
-    let client = RenetClient::new(connection_config());
-
-    let server_addr = "127.0.0.1:5000".parse().unwrap();
-    // let server_addr = "138.197.16.199:5000".parse().unwrap();
-    let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
-    let current_time = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .unwrap();
-    let client_id = current_time.as_millis() as u64;
-    let authentication = ClientAuthentication::Unsecure {
-        client_id,
-        protocol_id: PROTOCOL_ID,
-        server_addr,
-        user_data: None,
-    };
-
-    let transport = NetcodeClientTransport::new(current_time, authentication, socket).unwrap();
-
-    app.configure_sets(Update, Connected.run_if(client_connected()));
-    app.insert_resource(client);
-    app.insert_resource(transport);
-
-    app.insert_resource(ClientLobby::default());
-    app.insert_resource(CurrentClientId(client_id));
-    app.insert_resource(NetworkEntities::default());
-
-    // If any error is found we just panic
-    fn panic_on_error_system(mut renet_error: EventReader<NetcodeTransportError>) {
-        for e in renet_error.read() {
-            panic!("{:?}", e);
-        }
-    }
-
-    app.add_systems(
-        Update,
-        panic_on_error_system.run_if(in_state(GameState::Gameloop)),
-    );
-    app.add_systems(
-        Update,
-        client_update_system.run_if(in_state(GameState::Gameloop)),
-    );
-}
-
 /// Network Systems and Events once the client is connected
 fn register_network_events(app: &mut App) {
-    app.add_event::<PlayerCreateEvent>();
-    app.add_event::<PlayerRemoveEvent>();
+    app.add_event::<CreatePlayerEvent>();
+    app.add_event::<RemovePlayerEvent>();
     app.add_event::<SpawnProjectileEvent>();
     app.add_event::<DamageEntityEvent>();
 
     app.add_systems(
         Update,
         (
-            player_spawn,
+            create_player,
             player_despawn,
             client_send_player_command_events,
         )

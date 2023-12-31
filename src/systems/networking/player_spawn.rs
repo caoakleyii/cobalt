@@ -5,23 +5,24 @@ use bevy_health_bar::ProgressBarBundle;
 use bevy_renet::renet::RenetServer;
 use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
 
+use crate::client::resources::{
+    ClientId, ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo,
+};
 use crate::components::{
     Animator, Controllable, EquipmentBundle, Player, PlayerBundle, PlayerCamera,
     ServerEquipmentBundle, ServerPlayerBundle, Team,
 };
-use crate::enums::{CollisionGroups, Equipment, ServerMessages, Sprites};
+use crate::enums::{CollisionGroups, Equipment, Sprites};
 use crate::events::{
-    ClientConnectedEvent, ClientDisconnectedEvent, PlayerCreateEvent, PlayerRemoveEvent,
+    ClientConnectedEvent, ClientDisconnectedEvent, CreatePlayerEvent, RemovePlayerEvent,
 };
+use crate::networking::networking::ServerMessages;
 use crate::networking::ServerChannel;
-use crate::resources::{
-    AssetHandler, AssetsConfig, ClientId, ClientLobby, CurrentClientId, NetworkEntities,
-    PlayerInfo, ServerLobby,
-};
+use crate::resources::{AssetHandler, AssetsConfig, ServerLobby};
 
-pub fn player_spawn(
+pub fn create_player(
     mut commands: Commands,
-    mut reader_player_create: EventReader<PlayerCreateEvent>,
+    mut reader_player_create: EventReader<CreatePlayerEvent>,
     mut lobby: ResMut<ClientLobby>,
     mut network_mapping: ResMut<NetworkEntities>,
     client_id: Res<CurrentClientId>,
@@ -125,7 +126,7 @@ pub fn player_spawn(
 
 pub fn player_despawn(
     mut commands: Commands,
-    mut reader_player_remove: EventReader<PlayerRemoveEvent>,
+    mut reader_player_remove: EventReader<RemovePlayerEvent>,
     mut lobby: ResMut<ClientLobby>,
     mut network_mapping: ResMut<NetworkEntities>,
 ) {
@@ -157,7 +158,7 @@ pub fn client_connected_to_server(
                 for (entity, player, transform, p_team) in &players {
                     let translation: [f32; 3] = transform.translation.into();
                     let message =
-                        bincode::serialize(&ServerMessages::PlayerCreate(PlayerCreateEvent {
+                        bincode::serialize(&ServerMessages::PlayerCreate(CreatePlayerEvent {
                             id: ClientId(player.id.raw()),
                             entity,
                             translation,
@@ -216,7 +217,7 @@ pub fn client_connected_to_server(
 
                 // send the player entity to the clients
                 let message =
-                    bincode::serialize(&ServerMessages::PlayerCreate(PlayerCreateEvent {
+                    bincode::serialize(&ServerMessages::PlayerCreate(CreatePlayerEvent {
                         id: ClientId(client_id.raw()),
                         entity: player_entity,
                         translation: spawn_point.to_array(),
@@ -246,7 +247,7 @@ pub fn client_disconnected(
                 }
 
                 let message =
-                    bincode::serialize(&ServerMessages::PlayerRemove(PlayerRemoveEvent {
+                    bincode::serialize(&ServerMessages::PlayerRemove(RemovePlayerEvent {
                         id: ClientId(client_id.raw()),
                     }))
                     .unwrap();

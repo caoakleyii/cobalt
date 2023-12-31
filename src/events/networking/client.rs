@@ -1,7 +1,7 @@
 use bevy::prelude::{Entity, Event};
 use serde::{Deserialize, Serialize};
 
-use crate::resources::ClientId;
+use crate::client::resources::ClientId;
 
 /**
  * Player Create Event
@@ -11,7 +11,7 @@ use crate::resources::ClientId;
  * server message
 */
 #[derive(Event, Debug, Serialize, Deserialize)]
-pub struct PlayerCreateEvent {
+pub struct CreatePlayerEvent {
     pub entity: Entity,
     pub id: ClientId,
     pub translation: [f32; 3],
@@ -25,7 +25,7 @@ pub struct PlayerCreateEvent {
  * server message
  */
 #[derive(Event, Debug, Serialize, Deserialize)]
-pub struct PlayerRemoveEvent {
+pub struct RemovePlayerEvent {
     pub id: ClientId,
 }
 
