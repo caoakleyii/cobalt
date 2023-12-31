@@ -6,8 +6,8 @@ use bevy::{
 use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 
 use super::{
-    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, KineticBodyBundle, Object2DBundle,
-    Velocity,
+    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, Damage, KineticBodyBundle,
+    Object2DBundle, Velocity,
 };
 
 #[derive(Component, Debug, Default)]
@@ -18,6 +18,8 @@ pub struct ProjectileBundle {
     pub projectile: Projectile,
 
     pub kinetic_body: AnimatedKineticBodyBundle,
+
+    pub damage: Damage,
 }
 
 impl ProjectileBundle {
@@ -58,6 +60,7 @@ impl ProjectileBundle {
                     ..Default::default()
                 },
             },
+            ..Default::default()
         }
     }
 }
@@ -67,6 +70,8 @@ pub struct ServerProjectileBundle {
     pub projectile: Projectile,
 
     pub kinetic_body: KineticBodyBundle,
+
+    pub damage: Damage,
 }
 
 impl ServerProjectileBundle {
@@ -93,6 +98,7 @@ impl ServerProjectileBundle {
                     ..Default::default()
                 },
             },
+            ..Default::default()
         }
     }
 }

@@ -4,7 +4,7 @@ use bevy_renet::renet::RenetClient;
 use crate::{
     components::Aim,
     enums::ServerMessages,
-    events::{PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent},
+    events::{DamageEntityEvent, PlayerCreateEvent, PlayerRemoveEvent, SpawnProjectileEvent},
     networking::{NetworkedEntities, ServerChannel},
     resources::NetworkEntities,
 };
@@ -13,12 +13,21 @@ pub fn client_update_system(
     mut writer_player_create: EventWriter<PlayerCreateEvent>,
     mut writer_player_remove: EventWriter<PlayerRemoveEvent>,
     mut writer_spawn_projectile: EventWriter<SpawnProjectileEvent>,
+    mut writer_damage_entity: EventWriter<DamageEntityEvent>,
     mut client: ResMut<RenetClient>,
     network_mapping: ResMut<NetworkEntities>,
     mut commands: Commands,
 ) {
     while let Some(message) = client.receive_message(ServerChannel::ServerMessages) {
-        let server_message: ServerMessages = bincode::deserialize(&message).unwrap();
+        let server_message = bincode::deserialize::<ServerMessages>(&message);
+        if server_message.is_err() {
+            println!(
+                "Failed to deserialize server message {:?}",
+                server_message.unwrap_err()
+            );
+            continue;
+        }
+        let server_message = server_message.unwrap();
         match server_message {
             ServerMessages::PlayerCreate(player_create_event) => {
                 writer_player_create.send(player_create_event);
@@ -28,6 +37,9 @@ pub fn client_update_system(
             }
             ServerMessages::SpawnProjectile(spawn_projectile_event) => {
                 writer_spawn_projectile.send(spawn_projectile_event);
+            }
+            ServerMessages::DamageEntity(damage_entity_event) => {
+                writer_damage_entity.send(damage_entity_event);
             }
         };
     }

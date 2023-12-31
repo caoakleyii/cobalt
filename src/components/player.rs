@@ -127,6 +127,8 @@ impl PlayerBundle {
 pub struct ServerPlayerBundle {
     pub player: Player,
 
+    pub health: Health,
+
     pub team: Team,
 
     pub kinetic_body: KineticBodyBundle,

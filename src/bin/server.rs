@@ -16,9 +16,9 @@ use utils::resources::{ServerLobby, TextAsset, TextLoader};
 use utils::systems::networking::server::server_update_system;
 use utils::systems::{
     apply_velocity, asset_config_loader_sytem, asset_loader_system, client_connected_to_server,
-    client_disconnected, equipment_use_system, handle_input, projectile_collisions,
-    server_network_sync, server_receive_player_command_system, server_receive_player_input_system,
-    spawn_projectile_server, tick_equipment_system,
+    client_disconnected, damage_collision, equipment_use_system, handle_input, server_network_sync,
+    server_receive_player_command_system, server_receive_player_input_system,
+    tick_equipment_system,
 };
 
 fn main() {
@@ -57,7 +57,7 @@ fn register_server_asset_systems(app: &mut App) {
 fn build_server_and_network_systems(app: &mut App) {
     let server = RenetServer::new(connection_config());
 
-    let public_addr = "127.0.0.1:5000".parse().unwrap();
+    let public_addr = "0.0.0.0:5000".parse().unwrap();
     let socket = UdpSocket::bind(public_addr).unwrap();
     let current_time: Duration = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
@@ -100,9 +100,8 @@ fn register_network_events(app: &mut App) {
             server_receive_player_command_system,
             tick_equipment_system,
             equipment_use_system,
-            spawn_projectile_server,
             apply_velocity,
-            projectile_collisions,
+            damage_collision,
         )
             .run_if(in_state(GameState::Gameloop)),
     );

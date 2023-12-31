@@ -24,10 +24,19 @@ impl Default for Speed {
  *
  * Component to define the health of an object
  */
-#[derive(Component, Default, Debug)]
+#[derive(Component, Debug)]
 pub struct Health {
     pub current: f32,
     pub max: f32,
+}
+
+impl Default for Health {
+    fn default() -> Self {
+        Self {
+            current: 100.0,
+            max: 100.0,
+        }
+    }
 }
 
 /**

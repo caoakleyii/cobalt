@@ -67,7 +67,7 @@ pub fn player_spawn(
             Vec2::new(hitbox_config.width, hitbox_config.height),
             CollisionGroup {
                 layer: CollisionGroups::Player as u32 | player_create_event.team,
-                mask: CollisionGroups::Projectile as u32,
+                mask: 0,
             },
         ));
 
@@ -92,7 +92,7 @@ pub fn player_spawn(
         let player_entity = player_entity.id();
 
         // Retrieve character assets from the already loaded resources
-        let (texture, animations, hitbox_config) = asset_handler
+        let (texture, animations, _hitbox_config) = asset_handler
             .textures
             .get(&Sprites::AK47)
             .expect("unexpected character requested.");
@@ -187,7 +187,6 @@ pub fn client_connected_to_server(
                 } else {
                     CollisionGroups::TeamBravo as u32
                 };
-                println!("Team: {}", team);
 
                 let spawn_point = Vec3::new(0.0, 0.0, 0.0);
                 let player_entity = commands
@@ -196,8 +195,8 @@ pub fn client_connected_to_server(
                         Transform::from_translation(spawn_point.clone()),
                         Vec2::new(hitbox_config.width, hitbox_config.height),
                         CollisionGroup {
-                            layer: team,
-                            mask: CollisionGroups::Projectile as u32,
+                            layer: CollisionGroups::Player as u32 | team,
+                            mask: 0,
                         },
                         Team(team.into()),
                     ))

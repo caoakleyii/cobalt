@@ -20,7 +20,7 @@ path = "src/bin/server.rs"
 
 [dependencies]
 bevy = { version = "0.12.1", features = ["dynamic_linking"] }
-bevy_2d_collisions = "0.2.0"
+bevy_2d_collisions = "0.3.0"
 bevy_common_assets = "0.7.0"
 bevy_health_bar = "0.1.0"
 bevy_renet = { version = "0.0.10", features = ["transport"] }

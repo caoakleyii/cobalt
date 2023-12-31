@@ -1,6 +1,6 @@
 use bevy::{
     prelude::{Bundle, Component, Handle, Transform, Vec2, Vec3},
-    sprite::{Sprite, SpriteSheetBundle, TextureAtlas},
+    sprite::{SpriteSheetBundle, TextureAtlas},
     time::{Timer, TimerMode},
 };
 
@@ -73,8 +73,8 @@ pub struct Equipment {
     pub projectile_speed: f32,
     pub projectile_size: f32,
     pub projectile_per_shot: u32,
-    pub layer: u32,
-    pub mask: u32,
+    pub projectile_layer: u32,
+    pub projectile_mask: u32,
     pub range: u32,
     pub fire_rate_timer: Timer,
     pub reload_timer: Timer,
@@ -95,8 +95,8 @@ impl From<&EquipmentStatsConfig> for Equipment {
             projectile_speed: value.projectile_speed,
             projectile_size: value.projectile_size,
             projectile_per_shot: value.projectile_per_shot,
-            layer: value.layers.iter().fold(0, |acc, x| acc | *x as u32),
-            mask: value.masks.iter().fold(0, |acc, x| acc | *x as u32),
+            projectile_layer: value.layers.iter().fold(0, |acc, x| acc | *x as u32),
+            projectile_mask: value.masks.iter().fold(0, |acc, x| acc | *x as u32),
             fire_rate_timer: Timer::from_seconds(value.fire_rate, TimerMode::Once),
             reload_timer: Timer::from_seconds(value.reload_time, TimerMode::Once),
         }

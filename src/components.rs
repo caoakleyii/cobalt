@@ -18,3 +18,6 @@ pub use self::equipment::*;
 
 pub mod projectile;
 pub use self::projectile::*;
+
+pub mod combat;
+pub use self::combat::*;

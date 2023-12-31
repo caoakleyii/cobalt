@@ -43,3 +43,15 @@ pub struct SpawnProjectileEvent {
     pub layer: u32,
     pub mask: u32,
 }
+
+/**
+ *
+ * A Bevy Event to inform client systems
+ * an entity should be damaged, contains the corresponding
+ * server message
+ */
+#[derive(Event, Debug, Serialize, Deserialize)]
+pub struct DamageEntityEvent {
+    pub entity: Entity,
+    pub damage: f32,
+}
