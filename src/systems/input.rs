@@ -6,9 +6,14 @@ use crate::client::resources::{ClientId, ClientLobby, CurrentClientId};
 use crate::components::{Controllable, Equipped, Player, PlayerCamera, Velocity};
 
 use crate::enums::EntityState;
-use crate::events::{EquippedUse, PlayerCommand, PlayerCommandEvent, PlayerInputEvent};
-use crate::networking::ClientChannel;
-use crate::resources::{PlayerInput, ServerLobby};
+use crate::events::EquippedUse;
+use crate::networking::channels::ClientChannel;
+use crate::player::events::PlayerCommand;
+use crate::resources::PlayerInput;
+use crate::server::{
+    events::{ClientSentCommandEvent, ClientSentInputEvent},
+    resources::ServerLobby,
+};
 
 pub fn capture_player_input_system(
     mut player_input: ResMut<PlayerInput>,
@@ -78,20 +83,10 @@ pub fn capture_player_command_input_system(
     }
 }
 
-// TODO: Probably needs some sort of throttilng to prevent spamming
-pub fn client_send_player_command_events(
-    mut client: ResMut<RenetClient>,
-    mut reader_player_command_event: EventReader<PlayerCommand>,
-) {
-    for player_command_event in reader_player_command_event.read() {
-        let player_command_message = bincode::serialize(&player_command_event).unwrap();
-        client.send_message(ClientChannel::Command, player_command_message);
-    }
-}
-
+// TODO: Rename possibly on_player_input
 pub fn server_receive_player_input_system(
     mut command: Commands,
-    mut reader_player_input_event: EventReader<PlayerInputEvent>,
+    mut reader_player_input_event: EventReader<ClientSentInputEvent>,
     lobby: ResMut<ServerLobby>,
 ) {
     for player_input_event in reader_player_input_event.read() {
@@ -104,9 +99,10 @@ pub fn server_receive_player_input_system(
     }
 }
 
+// TODO: Rename possibly on_player_command
 pub fn server_receive_player_command_system(
     mut writer_equippable_use: EventWriter<EquippedUse>,
-    mut reader_player_command_event: EventReader<PlayerCommandEvent>,
+    mut reader_player_command_event: EventReader<ClientSentCommandEvent>,
     lobby: ResMut<ServerLobby>,
 ) {
     for player_command_event in reader_player_command_event.read() {

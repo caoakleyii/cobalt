@@ -13,7 +13,7 @@ use self::resources::*;
 use crate::{
     client::sets::Connected,
     enums::GameState,
-    networking::{connection_config, PROTOCOL_ID},
+    networking::config::{connection_config, PROTOCOL_ID},
 };
 
 use self::systems::client_update_system;

@@ -5,11 +5,11 @@ use bevy::{
 use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 use bevy_renet::renet::ClientId;
 
-use crate::enums::CollisionGroups;
+use crate::{enums::CollisionGroups, networking::components::NetworkedEntityBundle};
 
 use super::{
     Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, Health, KineticBodyBundle,
-    NetworkedEntityBundle, Object2DBundle,
+    Object2DBundle,
 };
 
 /**

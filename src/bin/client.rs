@@ -6,19 +6,17 @@ use bevy_renet::{transport::NetcodeClientPlugin, RenetClientPlugin};
 use utils::client::sets::Connected;
 use utils::client::ClientPlugin;
 use utils::events::DamageEntityEvent;
+use utils::player::PlayerPlugin;
 use utils::systems::on_damage_entity;
 use utils::{
     enums::GameState,
-    events::{
-        CreatePlayerEvent, EquippedUse, PlayerCommand, RemovePlayerEvent, SpawnProjectileEvent,
-    },
+    events::{EquippedUse, SpawnProjectileEvent},
     resources::{AssetLoading, PlayerInput, TextAsset, TextLoader},
     systems::{
         animate_sprites, apply_direction, apply_velocity, asset_config_loader_sytem,
         asset_loader_state_system, asset_loader_system, capture_player_command_input_system,
-        capture_player_input_system, client_send_player_command_events,
-        client_send_player_input_system, create_player, handle_input, health_bar_update,
-        player_despawn, spawn_projectile, sync_animation_state, tick_equipment_system,
+        capture_player_input_system, client_send_player_input_system, handle_input,
+        health_bar_update, spawn_projectile, sync_animation_state, tick_equipment_system,
     },
 };
 
@@ -32,6 +30,7 @@ fn main() {
         ClientPlugin,
         ProgressBarPlugin,
         CollisionsPlugin,
+        PlayerPlugin,
     ));
 
     app.add_state::<GameState>();
@@ -59,20 +58,8 @@ fn register_client_asset_systems(app: &mut App) {
 }
 /// Network Systems and Events once the client is connected
 fn register_network_events(app: &mut App) {
-    app.add_event::<CreatePlayerEvent>();
-    app.add_event::<RemovePlayerEvent>();
     app.add_event::<SpawnProjectileEvent>();
     app.add_event::<DamageEntityEvent>();
-
-    app.add_systems(
-        Update,
-        (
-            create_player,
-            player_despawn,
-            client_send_player_command_events,
-        )
-            .in_set(Connected),
-    );
 }
 
 /// Game Loop Systems outside of network
@@ -83,7 +70,6 @@ fn reigster_game_systems(app: &mut App) {
     // Some of this can be moved to a plugin
     // or abstracted so both client and server can use it
     app.add_event::<EquippedUse>();
-    app.add_event::<PlayerCommand>();
 
     app.add_systems(
         Update,

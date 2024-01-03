@@ -3,5 +3,7 @@ pub mod components;
 pub mod enums;
 pub mod events;
 pub mod networking;
+pub mod player;
 pub mod resources;
+pub mod server;
 pub mod systems;

@@ -3,8 +3,9 @@ use bevy_renet::renet::RenetClient;
 
 use crate::{
     components::Aim,
-    events::{CreatePlayerEvent, DamageEntityEvent, RemovePlayerEvent, SpawnProjectileEvent},
-    networking::{networking::ServerMessages, NetworkedEntities, ServerChannel},
+    events::{DamageEntityEvent, SpawnProjectileEvent},
+    networking::{channels::ServerChannel, models::NetworkedEntities, networking::ServerMessages},
+    player::events::{CreatePlayerEvent, RemovePlayerEvent},
 };
 
 use super::resources::NetworkEntities;

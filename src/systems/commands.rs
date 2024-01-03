@@ -1,3 +1,4 @@
+use crate::networking::channels::ServerChannel;
 use bevy::{
     math::Vec2,
     prelude::{Assets, Children, Commands, EventReader, Quat, Query, Res, ResMut, Transform},
@@ -16,7 +17,7 @@ use crate::{
     },
     enums::CollisionGroups,
     events::{DamageEntityEvent, EquippedUse, SpawnProjectileEvent},
-    networking::{networking::ServerMessages, ServerChannel},
+    networking::networking::ServerMessages,
     resources::AssetHandler,
 };
 
