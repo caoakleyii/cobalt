@@ -1,3 +1,4 @@
+use crate::deck::card::equipment::components::EquipmentBundle;
 use bevy::prelude::*;
 use bevy::sprite::TextureAtlas;
 use bevy_2d_collisions::components::CollisionGroup;
@@ -5,7 +6,7 @@ use bevy_health_bar::ProgressBarBundle;
 use bevy_renet::renet::RenetClient;
 
 use crate::client::resources::{ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo};
-use crate::components::{Animator, Controllable, EquipmentBundle, PlayerBundle, PlayerCamera};
+use crate::components::{Animator, Controllable, PlayerBundle, PlayerCamera};
 use crate::enums::{CollisionGroups, Equipment, Sprites};
 use crate::networking::channels::ClientChannel;
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};

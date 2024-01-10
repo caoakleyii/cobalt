@@ -2,15 +2,14 @@ use bevy::prelude::*;
 use bevy_2d_collisions::CollisionsPlugin;
 
 use bevy_renet::{transport::NetcodeServerPlugin, RenetServerPlugin};
+use utils::deck::DeckPlugin;
 use utils::enums::GameState;
-use utils::events::{EquippedUse, SpawnProjectileEvent};
 
 use utils::resources::{TextAsset, TextLoader};
 use utils::server::ServerPlugin;
 use utils::systems::{
-    apply_velocity, asset_config_loader_sytem, asset_loader_system, damage_collision,
-    equipment_use_system, handle_input, server_receive_player_command_system,
-    server_receive_player_input_system, tick_equipment_system,
+    apply_velocity, asset_config_loader_sytem, asset_loader_system, handle_input,
+    server_receive_player_command_system, server_receive_player_input_system,
 };
 
 fn main() {
@@ -23,6 +22,7 @@ fn main() {
         NetcodeServerPlugin,
         CollisionsPlugin,
         ServerPlugin,
+        DeckPlugin,
     ));
 
     app.add_state::<GameState>();
@@ -46,19 +46,13 @@ fn register_server_asset_systems(app: &mut App) {
 }
 
 fn register_network_events(app: &mut App) {
-    app.add_event::<EquippedUse>();
-    app.add_event::<SpawnProjectileEvent>();
-
     app.add_systems(
         Update,
         (
             server_receive_player_input_system,
             handle_input,
             server_receive_player_command_system,
-            tick_equipment_system,
-            equipment_use_system,
             apply_velocity,
-            damage_collision,
         )
             .run_if(in_state(GameState::Gameloop)),
     );

@@ -5,11 +5,11 @@ use bevy::{
 };
 
 use crate::{
+    components::{Animated2DObjectBundle, Animator, Speed, Velocity},
     enums::{Equipment as EquipmentType, Sprites},
+    math::{angle_between, vec2_from_vec3},
     resources::EquipmentStatsConfig,
 };
-
-use super::{Animated2DObjectBundle, Animator, Speed, Velocity};
 
 // BUNDLE NEEDED for equipment and animation etc.
 #[derive(Clone, Bundle)]
@@ -129,19 +129,4 @@ impl Equipment {
     pub fn reload(&mut self) {
         self.magazine = self.max_magazine;
     }
-}
-
-#[derive(Clone, Debug, Component)]
-pub struct Inventory {
-    pub items: Vec<Equipped>,
-}
-
-pub fn angle_between(from: &Vec2, to: &Vec2) -> f32 {
-    let y = to.y - from.y;
-    let x = to.x - from.x;
-    y.atan2(x)
-}
-
-pub fn vec2_from_vec3(from: &Vec3) -> Vec2 {
-    Vec2::new(from.x, from.y)
 }

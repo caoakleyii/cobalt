@@ -1,3 +1,4 @@
+use bevy::prelude::{Deref, DerefMut};
 use bevy::{
     math::Vec2,
     prelude::{Bundle, Component, Handle, Transform},
@@ -5,10 +6,20 @@ use bevy::{
 };
 use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 
-use super::{
-    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, Damage, KineticBodyBundle,
-    Object2DBundle, Velocity,
+use crate::components::{
+    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, KineticBodyBundle, Object2DBundle,
+    Velocity,
 };
+
+// DAMAGE Keyword Component
+#[derive(Component, Debug, Deref, DerefMut)]
+pub struct Damage(pub f32);
+
+impl Default for Damage {
+    fn default() -> Self {
+        Self(10.0)
+    }
+}
 
 #[derive(Component, Debug, Default)]
 pub struct Projectile;

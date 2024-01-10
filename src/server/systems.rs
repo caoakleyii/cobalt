@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_renet::renet::{RenetServer, ServerEvent};
 
 use crate::{
+    deck::card::equipment::components::ServerEquipmentBundle,
     enums::EntityState,
     networking::{
         channels::{ClientChannel, ServerChannel},
@@ -19,7 +20,7 @@ use bevy_2d_collisions::components::CollisionGroup;
 use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
 
 use crate::client::resources::ClientId;
-use crate::components::{Player, ServerEquipmentBundle, ServerPlayerBundle, Team};
+use crate::components::{Player, ServerPlayerBundle, Team};
 use crate::enums::{CollisionGroups, Equipment, Sprites};
 use crate::networking::networking::ServerMessages;
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};

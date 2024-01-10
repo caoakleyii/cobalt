@@ -21,12 +21,8 @@ impl Plugin for PlayerPlugin {
                 player_despawn,
                 client_send_player_command_events,
             )
-                .run_if(in_state(GameState::Gameloop)),
-        );
-
-        app.add_systems(
-            Update,
-            (client_send_player_command_events,).in_set(Connected),
+                .run_if(in_state(GameState::Gameloop))
+                .in_set(Connected),
         );
 
         app.add_event::<CreatePlayerEvent>();

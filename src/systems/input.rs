@@ -3,10 +3,11 @@ use bevy::window::PrimaryWindow;
 use bevy_renet::renet::RenetClient;
 
 use crate::client::resources::{ClientId, ClientLobby, CurrentClientId};
-use crate::components::{Controllable, Equipped, Player, PlayerCamera, Velocity};
+use crate::components::{Controllable, Player, PlayerCamera, Velocity};
 
+use crate::deck::card::equipment::components::Equipped;
+use crate::deck::card::equipment::events::EquippedUse;
 use crate::enums::EntityState;
-use crate::events::EquippedUse;
 use crate::networking::channels::ClientChannel;
 use crate::player::events::PlayerCommand;
 use crate::resources::PlayerInput;

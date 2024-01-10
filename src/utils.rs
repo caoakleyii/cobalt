@@ -1,7 +1,9 @@
 pub mod client;
 pub mod components;
+pub mod deck;
 pub mod enums;
 pub mod events;
+pub mod math;
 pub mod networking;
 pub mod player;
 pub mod resources;

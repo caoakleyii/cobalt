@@ -3,7 +3,7 @@ use bevy_renet::renet::RenetClient;
 
 use crate::{
     components::Aim,
-    events::{DamageEntityEvent, SpawnProjectileEvent},
+    deck::keyword::events::{DamageEntityEvent, SpawnProjectileEvent},
     networking::{channels::ServerChannel, models::NetworkedEntities, networking::ServerMessages},
     player::events::{CreatePlayerEvent, RemovePlayerEvent},
 };

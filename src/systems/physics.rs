@@ -5,7 +5,10 @@ use bevy::{
     time::Time,
 };
 
-use crate::components::{angle_between, vec2_from_vec3, Aim, Velocity};
+use crate::{
+    components::{Aim, Velocity},
+    math::{angle_between, vec2_from_vec3},
+};
 
 pub fn apply_velocity(dt: Res<Time>, mut query: Query<(&mut Transform, &Velocity)>) {
     for (mut transform, vel) in &mut query {

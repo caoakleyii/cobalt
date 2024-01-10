@@ -1,7 +1,7 @@
+use crate::deck::keyword::events::{DamageEntityEvent, SpawnProjectileEvent};
 use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 
-use crate::events::{DamageEntityEvent, SpawnProjectileEvent};
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};
 
 /**
