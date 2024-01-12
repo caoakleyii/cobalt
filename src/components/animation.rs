@@ -10,8 +10,8 @@ use bevy::{
 };
 
 use crate::{
+    asset::resources::AnimationConfig,
     enums::{state::EgocentricDirection, EntityState},
-    resources::AnimationConfig,
 };
 
 use super::Object2D;

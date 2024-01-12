@@ -5,12 +5,13 @@ use bevy_2d_collisions::components::CollisionGroup;
 use bevy_health_bar::ProgressBarBundle;
 use bevy_renet::renet::RenetClient;
 
+use crate::asset::enums::{Equipment, Sprites};
+use crate::asset::resources::{AssetHandler, AssetsConfig};
 use crate::client::resources::{ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo};
 use crate::components::{Animator, Controllable, PlayerBundle, PlayerCamera};
-use crate::enums::{CollisionGroups, Equipment, Sprites};
+use crate::enums::CollisionGroups;
 use crate::networking::channels::ClientChannel;
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};
-use crate::resources::{AssetHandler, AssetsConfig};
 
 use super::events::PlayerCommand;
 

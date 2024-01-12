@@ -3,16 +3,16 @@ use bevy_2d_collisions::CollisionsPlugin;
 use bevy_health_bar::ProgressBarPlugin;
 use bevy_renet::{transport::NetcodeClientPlugin, RenetClientPlugin};
 
+use utils::asset::AssetPlugin as InternalAssetPlugin;
 use utils::client::sets::Connected;
 use utils::client::ClientPlugin;
 use utils::deck::DeckPlugin;
 use utils::player::PlayerPlugin;
+use utils::resources::PlayerInput;
 use utils::{
     enums::GameState,
-    resources::{AssetLoading, PlayerInput, TextAsset, TextLoader},
     systems::{
-        animate_sprites, apply_direction, apply_velocity, asset_config_loader_sytem,
-        asset_loader_state_system, asset_loader_system, capture_player_command_input_system,
+        animate_sprites, apply_direction, apply_velocity, capture_player_command_input_system,
         capture_player_input_system, client_send_player_input_system, handle_input,
         health_bar_update, sync_animation_state,
     },
@@ -26,6 +26,7 @@ fn main() {
         RenetClientPlugin,
         NetcodeClientPlugin,
         ClientPlugin,
+        InternalAssetPlugin,
         ProgressBarPlugin,
         CollisionsPlugin,
         PlayerPlugin,
@@ -42,22 +43,12 @@ fn main() {
 }
 
 fn register_client_asset_systems(app: &mut App) {
-    app.init_asset::<TextAsset>();
-    app.init_asset_loader::<TextLoader>();
-
-    app.add_systems(Startup, asset_config_loader_sytem);
-    app.add_systems(
-        Update,
-        asset_loader_system.run_if(in_state(GameState::Loading)),
-    );
-
-    app.add_systems(Update, (animate_sprites, asset_loader_state_system));
+    app.add_systems(Update, (animate_sprites));
 }
 
 /// Game Loop Systems outside of network
 fn reigster_game_systems(app: &mut App) {
     app.insert_resource(PlayerInput::default());
-    app.insert_resource(AssetLoading::default());
 
     app.add_systems(
         Update,

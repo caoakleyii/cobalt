@@ -5,10 +5,10 @@ use bevy::{
 };
 
 use crate::{
+    asset::enums::{Equipment as EquipmentType, Sprites},
+    asset::resources::EquipmentStatsConfig,
     components::{Animated2DObjectBundle, Animator, Speed, Velocity},
-    enums::{Equipment as EquipmentType, Sprites},
     math::{angle_between, vec2_from_vec3},
-    resources::EquipmentStatsConfig,
 };
 
 // BUNDLE NEEDED for equipment and animation etc.

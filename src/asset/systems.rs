@@ -9,10 +9,8 @@ use bevy::{
     sprite::TextureAtlas,
 };
 
-use crate::{
-    enums::GameState,
-    resources::{AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset},
-};
+use super::resources::{AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset};
+use crate::enums::GameState;
 
 pub fn asset_config_loader_sytem(asset_server: Res<AssetServer>, mut commands: Commands) {
     // load assets into asset handler

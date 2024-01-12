@@ -19,13 +19,14 @@ use super::events::{ClientConnectedEvent, ClientDisconnectedEvent};
 use bevy_2d_collisions::components::CollisionGroup;
 use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
 
+use crate::asset::enums::{Equipment, Sprites};
 use crate::client::resources::ClientId;
 use crate::components::{Player, ServerPlayerBundle, Team};
-use crate::enums::{CollisionGroups, Equipment, Sprites};
+use crate::enums::CollisionGroups;
 use crate::networking::networking::ServerMessages;
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};
 
-use crate::resources::{AssetHandler, AssetsConfig};
+use crate::asset::resources::{AssetHandler, AssetsConfig};
 
 use crate::server::resources::ServerLobby;
 

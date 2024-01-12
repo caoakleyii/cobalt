@@ -17,8 +17,8 @@ use bevy_2d_collisions::components::CollisionGroup;
 use bevy_renet::renet::RenetServer;
 
 use crate::{
-    components::Team, enums::CollisionGroups, networking::networking::ServerMessages,
-    resources::AssetHandler,
+    asset::resources::AssetHandler, components::Team, enums::CollisionGroups,
+    networking::networking::ServerMessages,
 };
 
 use super::events::EquippedUse;

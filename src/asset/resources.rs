@@ -9,7 +9,8 @@ use bevy::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::enums::{CollisionGroups, EntityState, Equipment, Sprites};
+use crate::asset::enums::{Equipment, Sprites};
+use crate::enums::{CollisionGroups, EntityState};
 
 #[derive(Resource, Default, Deref)]
 pub struct AssetLoading(pub u32);
