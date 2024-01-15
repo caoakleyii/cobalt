@@ -1,6 +1,6 @@
 use bevy_renet::renet::ConnectionConfig;
 
-use super::{ClientChannel, ServerChannel};
+use super::channels::{ClientChannel, ServerChannel};
 
 pub fn connection_config() -> ConnectionConfig {
     ConnectionConfig {
