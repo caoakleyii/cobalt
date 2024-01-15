@@ -5,9 +5,9 @@ use bevy_health_bar::ProgressBarPlugin;
 use bevy_renet::{transport::NetcodeClientPlugin, RenetClientPlugin};
 
 use utils::{
-    animation::AnimationPlugin, client::ClientPlugin, deck::DeckPlugin, enums::GameState,
-    input::InputPlugin, physics::PhysicsPlugin, player::PlayerPlugin, resources::PlayerInput,
-    stats::StatsPlugin, ui::UiPlugin,
+    animation::AnimationPlugin, asset::AssetPlugin as InternalAssetPlugin, client::ClientPlugin,
+    deck::DeckPlugin, enums::GameState, input::InputPlugin, physics::PhysicsPlugin,
+    player::PlayerPlugin, stats::StatsPlugin, ui::UiPlugin,
 };
 
 fn main() {

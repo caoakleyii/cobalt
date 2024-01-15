@@ -3,16 +3,8 @@ use bevy_2d_collisions::CollisionsPlugin;
 
 use bevy_renet::{transport::NetcodeServerPlugin, RenetServerPlugin};
 use utils::{
-    deck::DeckPlugin,
-    enums::GameState,
-    input::InputPlugin,
-    physics::PhysicsPlugin,
-    server::ServerPlugin,
-    stats::StatsPlugin,
-    systems::{
-        apply_velocity, handle_input, server_receive_player_command_system,
-        server_receive_player_input_system,
-    },
+    asset::AssetPlugin as InternalAssetPlugin, deck::DeckPlugin, enums::GameState,
+    input::InputPlugin, physics::PhysicsPlugin, server::ServerPlugin, stats::StatsPlugin,
 };
 
 fn main() {
