@@ -1,13 +1,3 @@
-use crate::{
-    deck::{
-        card::equipment::components::Equipped,
-        keyword::{
-            components::{Damage, ServerProjectileBundle},
-            events::SpawnProjectileEvent,
-        },
-    },
-    networking::channels::ServerChannel,
-};
 use bevy::{
     math::Vec2,
     prelude::{Children, Commands, EventReader, Quat, Query, Res, ResMut, Transform},
@@ -17,8 +7,17 @@ use bevy_2d_collisions::components::CollisionGroup;
 use bevy_renet::renet::RenetServer;
 
 use crate::{
-    asset::resources::AssetHandler, components::Team, enums::CollisionGroups,
-    networking::networking::ServerMessages,
+    asset::resources::AssetHandler,
+    deck::{
+        card::equipment::components::Equipped,
+        keyword::{
+            components::{Damage, ServerProjectileBundle},
+            events::SpawnProjectileEvent,
+        },
+    },
+    enums::CollisionGroups,
+    networking::{channels::ServerChannel, networking::ServerMessages},
+    player::components::Team,
 };
 
 use super::events::EquippedUse;

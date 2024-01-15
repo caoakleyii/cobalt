@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{client::sets::Connected, enums::GameState};
+use crate::{client::sets::Connected, enums::GameState, input::resources::PlayerInput};
 
 use self::{
     events::{CreatePlayerEvent, PlayerCommand, RemovePlayerEvent},
@@ -29,5 +29,7 @@ impl Plugin for PlayerPlugin {
         app.add_event::<CreatePlayerEvent>();
         app.add_event::<RemovePlayerEvent>();
         app.add_event::<PlayerCommand>();
+
+        app.insert_resource(PlayerInput::default());
     }
 }

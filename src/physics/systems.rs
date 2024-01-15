@@ -6,9 +6,11 @@ use bevy::{
 };
 
 use crate::{
-    components::{Aim, Velocity},
+    input::components::Aim,
     math::{angle_between, vec2_from_vec3},
 };
+
+use super::components::Velocity;
 
 pub fn apply_velocity(dt: Res<Time>, mut query: Query<(&mut Transform, &Velocity)>) {
     for (mut transform, vel) in &mut query {

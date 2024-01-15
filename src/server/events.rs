@@ -1,7 +1,7 @@
 use bevy::ecs::event::Event;
 use bevy_renet::renet::ServerEvent;
 
-use crate::{player::events::PlayerCommand, resources::PlayerInput};
+use crate::{input::resources::PlayerInput, player::events::PlayerCommand};
 
 /**
  * Client Connected Event

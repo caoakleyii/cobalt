@@ -1,7 +1,7 @@
 use bevy::prelude::{Children, Query};
 use bevy_health_bar::ProgressBar;
 
-use crate::components::Health;
+use crate::stats::components::Health;
 
 pub fn health_bar_update(
     query: Query<(&Health, &Children)>,

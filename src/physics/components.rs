@@ -1,44 +1,11 @@
 use crate::animation::components::Animated2DObjectBundle;
-use bevy::prelude::{Bundle, Component, Deref, DerefMut, Vec2};
+use crate::body::components::Object2DBundle;
+use bevy::ecs::bundle::Bundle;
+use bevy::ecs::component::Component;
+use bevy::math::Vec2;
 use bevy_2d_collisions::components::CollisionBundle;
 
-use super::Object2DBundle;
-
-/**
- * Speed
- *
- * Container for speed floats
- * ? Perhaps can be removed as a container since we have a velocity
- * ? component now.
- */
-#[derive(Component, Deref, DerefMut, Debug)]
-pub struct Speed(pub f32);
-
-impl Default for Speed {
-    fn default() -> Self {
-        Self(100.0)
-    }
-}
-
-/**
- * Health
- *
- * Component to define the health of an object
- */
-#[derive(Component, Debug)]
-pub struct Health {
-    pub current: f32,
-    pub max: f32,
-}
-
-impl Default for Health {
-    fn default() -> Self {
-        Self {
-            current: 100.0,
-            max: 100.0,
-        }
-    }
-}
+use crate::stats::components::Speed;
 
 /**
  * Velocity
@@ -95,31 +62,6 @@ pub struct KineticBodyBundle {
 pub struct AnimatedKineticBodyBundle {
     pub velocity: Velocity,
 
-    pub animated_2d_object: Animated2DObjectBundle,
-
-    pub collision_bundle: CollisionBundle,
-}
-
-/**
- * Static Body
- *
- * A body that is intended to be stationary without animation
- * cna be used by server without rendering
- */
-#[derive(Bundle, Default)]
-pub struct StaticBodyBundle {
-    pub object_2d_bundle: Object2DBundle,
-
-    pub collision_bundle: CollisionBundle,
-}
-
-/**
- * Animated Static Body
- *
- * An animated body that is intended to be stationary
- */
-#[derive(Bundle, Default)]
-pub struct AnimatedStaticBodyBundle {
     pub animated_2d_object: Animated2DObjectBundle,
 
     pub collision_bundle: CollisionBundle,

@@ -15,8 +15,9 @@ use crate::{
     animation::components::Animator,
     asset::resources::AssetHandler,
     client::resources::NetworkEntities,
-    components::{Health, Velocity},
     networking::{channels::ServerChannel, networking::ServerMessages},
+    physics::components::Velocity,
+    stats::components::Health,
 };
 
 use super::{

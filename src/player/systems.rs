@@ -1,4 +1,6 @@
 use crate::deck::card::equipment::components::EquipmentBundle;
+use crate::input::components::{Controllable, PlayerCamera};
+use crate::player::components::PlayerBundle;
 use bevy::prelude::*;
 use bevy::sprite::TextureAtlas;
 use bevy_2d_collisions::components::CollisionGroup;
@@ -9,7 +11,6 @@ use crate::animation::components::Animator;
 use crate::asset::enums::{Equipment, Sprites};
 use crate::asset::resources::{AssetHandler, AssetsConfig};
 use crate::client::resources::{ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo};
-use crate::components::{Controllable, PlayerBundle, PlayerCamera};
 use crate::enums::CollisionGroups;
 use crate::networking::channels::ClientChannel;
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};

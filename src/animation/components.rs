@@ -11,10 +11,9 @@ use bevy::{
 
 use crate::{
     asset::resources::AnimationConfig,
+    body::components::Object2D,
     enums::{state::EgocentricDirection, EntityState},
 };
-
-use crate::components::Object2D;
 
 /**
 * Aniamtion Timer

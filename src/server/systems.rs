@@ -1,34 +1,36 @@
 use bevy::prelude::*;
-use bevy_renet::renet::{RenetServer, ServerEvent};
+use bevy_2d_collisions::components::CollisionGroup;
+use bevy_renet::renet::{
+    RenetServer,
+    ServerEvent::{self, ClientConnected, ClientDisconnected},
+};
 
 use crate::{
+    asset::{
+        enums::{Equipment, Sprites},
+        resources::{AssetHandler, AssetsConfig},
+    },
+    client::resources::ClientId,
     deck::card::equipment::components::ServerEquipmentBundle,
-    enums::EntityState,
+    enums::{CollisionGroups, EntityState},
+    input::resources::PlayerInput,
     networking::{
         channels::{ClientChannel, ServerChannel},
         components::SyncedEntity,
         models::NetworkedEntities,
+        networking::ServerMessages,
     },
-    player::events::PlayerCommand,
-    resources::PlayerInput,
-    server::events::{ClientSentCommandEvent, ClientSentInputEvent},
+    player::{
+        components::{Player, ServerPlayerBundle, Team},
+        events::{CreatePlayerEvent, PlayerCommand, RemovePlayerEvent},
+    },
+    server::{
+        events::{ClientSentCommandEvent, ClientSentInputEvent},
+        resources::ServerLobby,
+    },
 };
 
 use super::events::{ClientConnectedEvent, ClientDisconnectedEvent};
-
-use bevy_2d_collisions::components::CollisionGroup;
-use bevy_renet::renet::ServerEvent::{ClientConnected, ClientDisconnected};
-
-use crate::asset::enums::{Equipment, Sprites};
-use crate::client::resources::ClientId;
-use crate::components::{Player, ServerPlayerBundle, Team};
-use crate::enums::CollisionGroups;
-use crate::networking::networking::ServerMessages;
-use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};
-
-use crate::asset::resources::{AssetHandler, AssetsConfig};
-
-use crate::server::resources::ServerLobby;
 
 pub fn server_update_system(
     mut writer_client_connected: EventWriter<ClientConnectedEvent>,
