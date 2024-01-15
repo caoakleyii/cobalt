@@ -7,10 +7,8 @@ use bevy_renet::renet::ClientId;
 
 use crate::{enums::CollisionGroups, networking::components::NetworkedEntityBundle};
 
-use super::{
-    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, Health, KineticBodyBundle,
-    Object2DBundle,
-};
+use super::{AnimatedKineticBodyBundle, Health, KineticBodyBundle, Object2DBundle};
+use crate::animation::components::{Animated2DObjectBundle, Animator};
 
 /**
  * Player

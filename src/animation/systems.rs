@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
-use crate::{components::Animator, enums::EntityState};
+use crate::animation::components::Animator;
+use crate::enums::EntityState;
 
 pub fn animate_sprites(dt: Res<Time>, mut query: Query<(&mut Animator, &mut TextureAtlasSprite)>) {
     for (mut animator, mut sprite) in &mut query {

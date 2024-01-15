@@ -1,3 +1,4 @@
+pub mod animation;
 pub mod asset;
 pub mod client;
 pub mod components;

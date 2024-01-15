@@ -5,9 +5,10 @@ use bevy::{
 };
 
 use crate::{
+    animation::components::{Animated2DObjectBundle, Animator},
     asset::enums::{Equipment as EquipmentType, Sprites},
     asset::resources::EquipmentStatsConfig,
-    components::{Animated2DObjectBundle, Animator, Speed, Velocity},
+    components::{Speed, Velocity},
     math::{angle_between, vec2_from_vec3},
 };
 

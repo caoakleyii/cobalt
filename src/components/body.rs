@@ -1,7 +1,8 @@
+use crate::animation::components::Animated2DObjectBundle;
 use bevy::prelude::{Bundle, Component, Deref, DerefMut, Vec2};
 use bevy_2d_collisions::components::CollisionBundle;
 
-use super::{Animated2DObjectBundle, Object2DBundle};
+use super::Object2DBundle;
 
 /**
  * Speed

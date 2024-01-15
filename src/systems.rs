@@ -1,6 +1,3 @@
-pub mod animation;
-pub use self::animation::*;
-
 pub mod input;
 pub use self::input::*;
 

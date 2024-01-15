@@ -7,6 +7,7 @@ use self::{
     systems::{client_send_player_command_events, create_player, player_despawn},
 };
 
+pub mod components;
 pub mod events;
 mod systems;
 

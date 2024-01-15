@@ -12,9 +12,10 @@ use bevy_2d_collisions::{components::CollisionGroup, events::CollisionBegin};
 use bevy_renet::renet::RenetServer;
 
 use crate::{
+    animation::components::Animator,
     asset::resources::AssetHandler,
     client::resources::NetworkEntities,
-    components::{Animator, Health, Velocity},
+    components::{Health, Velocity},
     networking::{channels::ServerChannel, networking::ServerMessages},
 };
 

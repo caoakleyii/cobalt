@@ -14,7 +14,7 @@ use crate::{
     enums::{state::EgocentricDirection, EntityState},
 };
 
-use super::Object2D;
+use crate::components::Object2D;
 
 /**
 * Aniamtion Timer

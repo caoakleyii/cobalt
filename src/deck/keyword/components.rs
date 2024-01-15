@@ -6,10 +6,8 @@ use bevy::{
 };
 use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 
-use crate::components::{
-    Animated2DObjectBundle, AnimatedKineticBodyBundle, Animator, KineticBodyBundle, Object2DBundle,
-    Velocity,
-};
+use crate::animation::components::{Animated2DObjectBundle, Animator};
+use crate::components::{AnimatedKineticBodyBundle, KineticBodyBundle, Object2DBundle, Velocity};
 
 // DAMAGE Keyword Component
 #[derive(Component, Debug, Deref, DerefMut)]
