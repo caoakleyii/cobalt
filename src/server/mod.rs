@@ -33,7 +33,6 @@ pub struct ServerPlugin;
 impl Plugin for ServerPlugin {
     fn build(&self, app: &mut App) {
         host_server(app);
-
         app.add_systems(
             Update,
             (

@@ -73,9 +73,6 @@ impl ClientPlugin {
             }
         }
 
-        app.add_systems(
-            Update,
-            panic_on_error_system.run_if(in_state(GameState::Gameloop)),
-        );
+        app.add_systems(Update, panic_on_error_system.in_set(Connected));
     }
 }
