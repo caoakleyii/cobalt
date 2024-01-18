@@ -16,7 +16,7 @@ use crate::{
     },
 };
 
-use super::components::{Controllable, PlayerCamera};
+use super::components::{Aim, Controllable, PlayerCamera};
 
 pub fn capture_player_input_system(
     mut player_input: ResMut<PlayerInput>,
@@ -51,7 +51,8 @@ pub fn capture_player_input_system(
     if let Some(current_player_info) = lobby.players.get(&ClientId(client_id.0)) {
         command
             .entity(current_player_info.client_entity)
-            .insert(player_input.clone());
+            .insert(player_input.clone())
+            .insert(Aim(player_input.aim));
     }
 }
 

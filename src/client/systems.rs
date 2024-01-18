@@ -1,9 +1,12 @@
-use bevy::prelude::{Commands, EventWriter, ResMut, Transform};
+use bevy::{
+    ecs::system::Query,
+    prelude::{Commands, EventWriter, ResMut, Transform},
+};
 use bevy_renet::renet::RenetClient;
 
 use crate::{
     deck::keyword::events::{DamageEntityEvent, SpawnProjectileEvent},
-    input::components::Aim,
+    input::components::{Aim, Controllable},
     networking::{channels::ServerChannel, models::NetworkedEntities, networking::ServerMessages},
     player::events::{CreatePlayerEvent, RemovePlayerEvent},
 };
@@ -18,6 +21,7 @@ pub fn client_update_system(
     mut client: ResMut<RenetClient>,
     network_mapping: ResMut<NetworkEntities>,
     mut commands: Commands,
+    query: Query<Option<&Controllable>>,
 ) {
     while let Some(message) = client.receive_message(ServerChannel::ServerMessages) {
         let server_message = bincode::deserialize::<ServerMessages>(&message);
@@ -61,7 +65,17 @@ pub fn client_update_system(
                 let state = networked_entities.states[i];
                 let aim = Aim(networked_entities.aim_ats[i].into());
                 if let Some(mut entity_command) = commands.get_entity(*entity) {
-                    entity_command.insert((transform, state, aim));
+                    if let Ok(controllable) = query.get(*entity) {
+                        if let Some(_) = controllable {
+                            // if local player is controlling
+                            // we should only lerp the position, if it's very inaccurate
+                            // and we don't need to update the aim.
+                            entity_command.insert(state);
+                        } else {
+                            // TODO: Lerp transform
+                            entity_command.insert((transform, state, aim));
+                        }
+                    }
                 }
             }
         }
