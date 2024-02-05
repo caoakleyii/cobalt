@@ -5,17 +5,13 @@ use bevy::prelude::*;
 use bevy::sprite::TextureAtlas;
 use bevy_2d_collisions::components::CollisionGroup;
 use bevy_health_bar::ProgressBarBundle;
-use bevy_renet::renet::RenetClient;
 
 use crate::animation::components::Animator;
 use crate::asset::enums::{Equipment, Sprites};
 use crate::asset::resources::{AssetHandler, AssetsConfig};
 use crate::client::resources::{ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo};
 use crate::enums::CollisionGroups;
-use crate::networking::channels::ClientChannel;
 use crate::player::events::{CreatePlayerEvent, RemovePlayerEvent};
-
-use super::events::PlayerCommand;
 
 pub fn create_player(
     mut commands: Commands,
@@ -118,17 +114,6 @@ pub fn create_player(
                     .with_transform(transform),
             )
             .set_parent(player_entity);
-    }
-}
-
-// TODO: Probably needs some sort of throttilng to prevent spamming
-pub fn client_send_player_command_events(
-    mut client: ResMut<RenetClient>,
-    mut reader_player_command_event: EventReader<PlayerCommand>,
-) {
-    for player_command_event in reader_player_command_event.read() {
-        let player_command_message = bincode::serialize(&player_command_event).unwrap();
-        client.send_message(ClientChannel::Command, player_command_message);
     }
 }
 

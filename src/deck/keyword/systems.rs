@@ -1,7 +1,7 @@
 use bevy::{
     asset::Assets,
     ecs::{
-        event::EventReader,
+        event::{EventReader, EventWriter},
         system::{Commands, Query, Res, ResMut},
     },
     math::{Quat, Vec2},
@@ -15,8 +15,11 @@ use crate::{
     animation::components::Animator,
     asset::resources::AssetHandler,
     client::resources::NetworkEntities,
+    enums::EntityState,
     networking::{channels::ServerChannel, networking::ServerMessages},
     physics::components::Velocity,
+    player::components::Death,
+    server::events::SyncEntityEvent,
     stats::components::Health,
 };
 
@@ -28,23 +31,37 @@ use super::{
 pub fn damage_collision(
     mut events: EventReader<CollisionBegin>,
     mut server: ResMut<RenetServer>,
+    mut writer_sync_entity: EventWriter<SyncEntityEvent>,
+    mut p_query: Query<(&mut Health, &mut EntityState)>,
+    mut command: Commands,
     dmg_query: Query<&Damage>,
-    mut p_query: Query<&mut Health>,
 ) {
     for event in events.read() {
         let dmg = dmg_query.get(event.entity);
-        let health = p_query.get_mut(event.detected);
+        let damagable_result = p_query.get_mut(event.detected);
 
         if dmg.is_err() {
             continue;
         }
 
-        if health.is_err() {
+        if damagable_result.is_err() {
             continue;
         }
 
         let dmg = dmg.unwrap();
-        let mut health = health.unwrap();
+        let (mut health, mut entity_state) = damagable_result.unwrap();
+        health.current -= **dmg;
+
+        if health.current <= 0.0 {
+            health.current = 0.0;
+            *entity_state = EntityState::Dead;
+            if let Some(mut entity_command) = command.get_entity(event.detected) {
+                entity_command.insert(Death::default());
+            }
+        } else {
+            println!("Entity hit!");
+            *entity_state = EntityState::Hit;
+        }
 
         server.broadcast_message(
             ServerChannel::ServerMessages,
@@ -54,7 +71,9 @@ pub fn damage_collision(
             }))
             .expect("Could not serialize damage entity message."),
         );
-        health.current -= **dmg;
+        writer_sync_entity.send(SyncEntityEvent {
+            entity: event.detected,
+        });
     }
 }
 

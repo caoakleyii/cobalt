@@ -1,18 +1,19 @@
+use core::fmt;
 use std::collections::HashMap;
 
 use bevy::{
     prelude::{Bundle, Component, Deref, DerefMut},
-    sprite::SpriteSheetBundle,
+    sprite::{SpriteSheetBundle, TextureAtlasSprite},
     time::{
         Timer,
         TimerMode::{self, Repeating},
     },
 };
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    asset::resources::AnimationConfig,
-    body::components::Object2D,
-    enums::{state::EgocentricDirection, EntityState},
+    asset::resources::AnimationConfig, body::components::Object2D,
+    enums::state::EgocentricDirection,
 };
 
 /**
@@ -30,13 +31,8 @@ impl Default for AnimationTimer {
 }
 
 impl AnimationTimer {
-    pub fn from_seconds(seconds: f32, should_loop: bool) -> Self {
-        let mode = if should_loop {
-            TimerMode::Repeating
-        } else {
-            TimerMode::Once
-        };
-        Self(Timer::from_seconds(seconds, mode))
+    pub fn from_seconds(seconds: f32, _should_loop: bool) -> Self {
+        Self(Timer::from_seconds(seconds, TimerMode::Repeating))
     }
 }
 
@@ -67,8 +63,9 @@ pub struct Animated2DObjectBundle {
 
 #[derive(Clone, Component, Default)]
 pub struct Animator {
-    pub current_animation: EntityState,
-    pub animations: HashMap<EntityState, Animation>,
+    current_animation: AnimationName,
+    pub animations: HashMap<AnimationName, Animation>,
+    // pub queued_animations: Vec<EntityState>,
 }
 
 impl Animator {
@@ -77,7 +74,7 @@ impl Animator {
 
         animations.iter().for_each(|animation_config| {
             let animation = Animation {
-                name: animation_config.name,
+                name: animation_config.name.clone(),
                 first: animation_config.start_index as usize,
                 last: animation_config.end_index as usize,
                 should_loop: animation_config.should_loop,
@@ -85,12 +82,16 @@ impl Animator {
                     animation_config.frame_speed,
                     animation_config.should_loop,
                 ),
+                interruptable_by: animation_config.interruptable_by.clone(),
+                finished: false,
             };
 
-            animator.animations.insert(animation_config.name, animation);
+            animator
+                .animations
+                .insert(animation_config.name.clone(), animation);
 
             if animation_config.is_default {
-                animator.current_animation = animation_config.name;
+                animator.current_animation = animation_config.name.clone();
             }
         });
 
@@ -100,19 +101,66 @@ impl Animator {
     pub fn current_animation(&mut self) -> &mut Animation {
         self.animations
             .get_mut(&self.current_animation)
-            .expect("current animation not found.")
+            .expect(&format!(
+                "current animation {:?} not found.",
+                self.current_animation
+            ))
     }
 
-    pub fn play(&mut self, animation: EntityState) {
-        self.current_animation = animation;
+    pub fn play(&mut self, animation: &AnimationName, sprite: &mut TextureAtlasSprite) {
+        if !self.can_be_interrupted_by(animation) {
+            return;
+        }
+
+        if self.current_animation == *animation {
+            return;
+        }
+
+        if self.animations.get(animation).is_none() {
+            return;
+        }
+
+        self.current_animation = animation.clone();
+        let current_animation = self.current_animation();
+        sprite.index = current_animation.first;
+        current_animation.timer.reset();
+        current_animation.timer.0.unpause();
+        current_animation.finished = false;
+    }
+
+    pub fn can_be_interrupted_by(&mut self, animation: &AnimationName) -> bool {
+        if self.current_animation().finished {
+            return true;
+        }
+
+        let interruptables = &self.current_animation().interruptable_by;
+
+        if interruptables.contains(&AnimationName("*".to_string())) {
+            return true;
+        }
+
+        interruptables.contains(&animation)
+    }
+}
+
+#[derive(
+    Clone, Component, Default, Deref, DerefMut, Serialize, Deserialize, Debug, Eq, PartialEq, Hash,
+)]
+pub struct AnimationName(pub String);
+
+impl fmt::Display for AnimationName {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
 #[derive(Clone, Default)]
 pub struct Animation {
-    pub name: EntityState,
+    pub name: AnimationName,
     pub first: usize,
     pub last: usize,
     pub should_loop: bool,
     pub timer: AnimationTimer,
+    pub interruptable_by: Vec<AnimationName>,
+    pub finished: bool,
 }

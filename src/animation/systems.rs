@@ -1,14 +1,22 @@
 use bevy::prelude::*;
 
 use crate::animation::components::Animator;
-use crate::enums::EntityState;
+
+use super::events::PlayAnimationEvent;
 
 pub fn animate_sprites(dt: Res<Time>, mut query: Query<(&mut Animator, &mut TextureAtlasSprite)>) {
     for (mut animator, mut sprite) in &mut query {
-        animator.current_animation().timer.tick(dt.delta());
-        if animator.current_animation().timer.just_finished() {
-            sprite.index = if sprite.index == animator.current_animation().last {
-                animator.current_animation().first
+        let animation = animator.current_animation();
+
+        animation.timer.tick(dt.delta());
+        if animation.timer.just_finished() {
+            sprite.index = if sprite.index == animation.last {
+                if animation.should_loop {
+                    animation.first
+                } else {
+                    animation.finished = true;
+                    sprite.index
+                }
             } else {
                 sprite.index + 1
             };
@@ -16,13 +24,15 @@ pub fn animate_sprites(dt: Res<Time>, mut query: Query<(&mut Animator, &mut Text
     }
 }
 
-pub fn sync_animation_state(
-    mut query: Query<(&mut Animator, &mut TextureAtlasSprite, &EntityState)>,
+pub fn play_animation(
+    mut reader_play_animation: EventReader<PlayAnimationEvent>,
+    mut query: Query<(&mut Animator, &mut TextureAtlasSprite)>,
 ) {
-    for (mut animator, mut sprite, entity_state) in &mut query {
-        if animator.current_animation != *entity_state {
-            animator.play(*entity_state);
-            sprite.index = animator.current_animation().first;
+    for play_animation_event in reader_play_animation.read() {
+        let animation_name = &play_animation_event.animation;
+        let entity = play_animation_event.entity;
+        if let Ok((mut animator, mut sprite)) = query.get_mut(entity) {
+            animator.play(animation_name, &mut sprite);
         }
     }
 }

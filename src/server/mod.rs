@@ -16,11 +16,13 @@ use crate::{
 
 use self::{
     events::{
-        ClientConnectedEvent, ClientDisconnectedEvent, ClientSentCommandEvent, ClientSentInputEvent,
+        ClientConnectedEvent, ClientDisconnectedEvent, ClientSentCommandEvent,
+        ClientSentInputEvent, SyncEntityEvent,
     },
     resources::ServerLobby,
     systems::{
-        client_connected_to_server, client_disconnected, server_network_sync, server_update_system,
+        client_connected_to_server, client_disconnected, on_demand_server_network_sync,
+        server_network_sync, server_update_system,
     },
 };
 
@@ -36,6 +38,7 @@ impl Plugin for ServerPlugin {
         app.add_systems(
             Update,
             (
+                on_demand_server_network_sync,
                 client_connected_to_server,
                 client_disconnected,
                 server_network_sync,
@@ -48,6 +51,7 @@ impl Plugin for ServerPlugin {
         app.add_event::<ClientDisconnectedEvent>();
         app.add_event::<ClientSentInputEvent>();
         app.add_event::<ClientSentCommandEvent>();
+        app.add_event::<SyncEntityEvent>();
 
         app.insert_resource(ServerLobby::default());
     }

@@ -42,6 +42,12 @@ impl Default for Player {
 pub struct Team(pub CollisionGroups);
 
 /**
+ * Death State
+*/
+#[derive(Component, Debug, Default)]
+pub struct Death;
+
+/**
  * Player Bundle
  *
  * Contains a player component, kinetic body bundle

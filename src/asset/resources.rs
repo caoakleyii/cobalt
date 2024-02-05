@@ -9,8 +9,11 @@ use bevy::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::asset::enums::{Equipment, Sprites};
-use crate::enums::{CollisionGroups, EntityState};
+use crate::enums::CollisionGroups;
+use crate::{
+    animation::components::AnimationName,
+    asset::enums::{Equipment, Sprites},
+};
 
 #[derive(Resource, Default, Deref)]
 pub struct AssetLoading(pub u32);
@@ -46,12 +49,13 @@ pub struct SpriteConfig {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AnimationConfig {
-    pub name: EntityState,
+    pub name: AnimationName,
     pub start_index: i32,
     pub end_index: i32,
     pub should_loop: bool,
     pub is_default: bool,
     pub frame_speed: f32,
+    pub interruptable_by: Vec<AnimationName>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]

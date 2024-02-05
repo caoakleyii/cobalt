@@ -24,6 +24,7 @@ impl Plugin for InputPlugin {
                 capture_player_input_system,
                 capture_player_command_input_system,
                 client_send_player_input_system,
+                client_send_player_command_events,
                 handle_input,
             )
                 .run_if(in_state(GameState::Gameloop))

@@ -42,8 +42,8 @@ impl ClientPlugin {
         // TODO turn this into a system that runs once in connecting game state
         let client = RenetClient::new(connection_config());
 
-        // let server_addr = "127.0.0.1:5000".parse().unwrap();
-        let server_addr = "138.197.16.199:5000".parse().unwrap();
+        let server_addr = "127.0.0.1:5000".parse().unwrap();
+        // let server_addr = "138.197.16.199:5000".parse().unwrap();
         let socket = UdpSocket::bind("0.0.0.0:0").unwrap();
         let current_time = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)

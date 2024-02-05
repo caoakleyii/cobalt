@@ -5,8 +5,9 @@ use bevy_2d_collisions::CollisionsPlugin;
 
 use bevy_renet::{transport::NetcodeServerPlugin, RenetServerPlugin};
 use utils::{
-    asset::AssetPlugin as InternalAssetPlugin, deck::DeckPlugin, enums::GameState,
-    input::InputPlugin, physics::PhysicsPlugin, server::ServerPlugin, stats::StatsPlugin,
+    animation::AnimationPlugin, asset::AssetPlugin as InternalAssetPlugin, deck::DeckPlugin,
+    enums::GameState, input::InputPlugin, physics::PhysicsPlugin, server::ServerPlugin,
+    stats::StatsPlugin,
 };
 
 fn main() {
@@ -22,6 +23,7 @@ fn main() {
         NetcodeServerPlugin,
         ServerPlugin,
         CollisionsPlugin,
+        AnimationPlugin,
         InternalAssetPlugin,
         DeckPlugin,
         InputPlugin,

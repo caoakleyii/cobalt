@@ -15,7 +15,8 @@
                         "end_index": 7,
                         "should_loop": true,
                         "is_default": true,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["*"]
                     },
                     {
                         "name":"Walk",
@@ -23,7 +24,8 @@
                         "end_index": 15,
                         "should_loop": true,
                         "is_default": false,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["*"]
                     },
                     {
                         "name":"Run",
@@ -31,7 +33,26 @@
                         "end_index": 23,
                         "should_loop": true,
                         "is_default": false,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
+                    },
+                    {
+                        "name": "Hit",
+                        "start_index": 56,
+                        "end_index": 59,
+                        "should_loop": false,
+                        "is_default": false,
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["Dead"]
+                    },
+                    {
+                        "name": "Dead",
+                        "start_index": 64,
+                        "end_index": 71,
+                        "should_loop": false,
+                        "is_default": false,
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
                     }
                 ],
                 "hitbox": {
@@ -55,7 +76,8 @@
                         "end_index": 5,
                         "should_loop": true,
                         "is_default": true,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["Hit"]
                     }
                 ],
                 "hitbox": {
@@ -79,7 +101,8 @@
                         "end_index": 6,
                         "should_loop": true,
                         "is_default": true,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["Hit"]
                     }
                 ]
             },
@@ -97,7 +120,8 @@
                         "end_index": 3,
                         "should_loop": true,
                         "is_default": true,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["Hit"]
                     }
                 ]
             },
@@ -115,7 +139,8 @@
                         "end_index": 11,
                         "should_loop": true,
                         "is_default": true,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": ["Shoot"]
                     },
                     {
                         "name": "Shoot",
@@ -123,7 +148,8 @@
                         "end_index": 11,
                         "should_loop": true,
                         "is_default": false,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
                     },
                     {
                         "name": "Reload",
@@ -131,7 +157,8 @@
                         "end_index": 3,
                         "should_loop": true,
                         "is_default": false,
-                        "frame_speed": 0.1
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
                     }
                 ]
             }
