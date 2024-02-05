@@ -1,4 +1,5 @@
 use bevy::prelude::{Component, States};
+use enum_display::EnumDisplay;
 use serde::{Deserialize, Serialize};
 
 /**
@@ -6,7 +7,9 @@ use serde::{Deserialize, Serialize};
  *
  * Used to define animations, and sync
  */
-#[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, Default, Component)]
+#[derive(
+    Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, Default, Component, EnumDisplay,
+)]
 pub enum EntityState {
     #[default]
     Idle,
@@ -14,6 +17,8 @@ pub enum EntityState {
     Run,
     Shoot,
     Reload,
+    Hit,
+    Dead,
 }
 
 /**

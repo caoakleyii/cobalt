@@ -5,10 +5,15 @@ use bevy::{
 use bevy_renet::renet::RenetClient;
 
 use crate::{
+    animation::events::PlayAnimationEvent,
     deck::keyword::events::{DamageEntityEvent, SpawnProjectileEvent},
+    enums::EntityState::Dead,
     input::components::{Aim, Controllable},
     networking::{channels::ServerChannel, models::NetworkedEntities, networking::ServerMessages},
-    player::events::{CreatePlayerEvent, RemovePlayerEvent},
+    player::{
+        components::Death,
+        events::{CreatePlayerEvent, RemovePlayerEvent},
+    },
 };
 
 use super::resources::NetworkEntities;
@@ -18,6 +23,7 @@ pub fn client_update_system(
     mut writer_player_remove: EventWriter<RemovePlayerEvent>,
     mut writer_spawn_projectile: EventWriter<SpawnProjectileEvent>,
     mut writer_damage_entity: EventWriter<DamageEntityEvent>,
+    mut writer_play_animation: EventWriter<PlayAnimationEvent>,
     mut client: ResMut<RenetClient>,
     network_mapping: ResMut<NetworkEntities>,
     mut commands: Commands,
@@ -70,13 +76,19 @@ pub fn client_update_system(
                             // if local player is controlling
                             // we should only lerp the position, if it's very inaccurate
                             // and we don't need to update the aim.
-                            entity_command.insert(state);
+                            entity_command.insert((transform, state));
                         } else {
                             // TODO: Lerp transform
                             entity_command.insert((transform, state, aim));
                         }
+
+                        if state == Dead {
+                            entity_command.insert(Death::default());
+                        }
                     }
                 }
+
+                writer_play_animation.send(PlayAnimationEvent::new(*entity, &state.to_string()));
             }
         }
     }

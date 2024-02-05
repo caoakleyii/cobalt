@@ -4,7 +4,7 @@ use crate::{client::sets::Connected, enums::GameState, input::resources::PlayerI
 
 use self::{
     events::{CreatePlayerEvent, PlayerCommand, RemovePlayerEvent},
-    systems::{client_send_player_command_events, create_player, player_despawn},
+    systems::{create_player, player_despawn},
 };
 
 pub mod components;
@@ -17,11 +17,7 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (
-                create_player,
-                player_despawn,
-                client_send_player_command_events,
-            )
+            (create_player, player_despawn)
                 .run_if(in_state(GameState::Gameloop))
                 .in_set(Connected),
         );

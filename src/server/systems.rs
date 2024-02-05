@@ -30,7 +30,7 @@ use crate::{
     },
 };
 
-use super::events::{ClientConnectedEvent, ClientDisconnectedEvent};
+use super::events::{ClientConnectedEvent, ClientDisconnectedEvent, SyncEntityEvent};
 
 pub fn server_update_system(
     mut writer_client_connected: EventWriter<ClientConnectedEvent>,
@@ -87,6 +87,28 @@ pub fn server_network_sync(
 
     let sync_message = bincode::serialize(&networked_entities).unwrap();
     server.broadcast_message(ServerChannel::NetworkedEntities, sync_message);
+}
+
+pub fn on_demand_server_network_sync(
+    mut server: ResMut<RenetServer>,
+    mut reader_forced_server_sync: EventReader<SyncEntityEvent>,
+    query: Query<(&Transform, &EntityState, &PlayerInput), With<SyncedEntity>>,
+) {
+    for sync_entity_event in reader_forced_server_sync.read() {
+        let mut networked_entities = NetworkedEntities::default();
+
+        if let Ok((transform, entity_state, player_input)) = query.get(sync_entity_event.entity) {
+            networked_entities.entities.push(sync_entity_event.entity);
+            networked_entities
+                .translations
+                .push(transform.translation.into());
+            networked_entities.aim_ats.push(player_input.aim.into());
+            networked_entities.states.push(*entity_state)
+        }
+
+        let sync_message = bincode::serialize(&networked_entities).unwrap();
+        server.broadcast_message(ServerChannel::NetworkedEntities, sync_message);
+    }
 }
 
 // TODO: Simplify the connect and write to a "client_connected" event; then a seperate system to handle the player create event within Player Plugin

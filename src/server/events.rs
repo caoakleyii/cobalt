@@ -1,4 +1,4 @@
-use bevy::ecs::event::Event;
+use bevy::ecs::{entity::Entity, event::Event};
 use bevy_renet::renet::ServerEvent;
 
 use crate::{input::resources::PlayerInput, player::events::PlayerCommand};
@@ -38,3 +38,8 @@ pub struct ClientSentInputEvent(pub PlayerInput, pub u64);
  */
 #[derive(Event, Debug)]
 pub struct ClientSentCommandEvent(pub PlayerCommand, pub u64);
+
+#[derive(Event, Debug)]
+pub struct SyncEntityEvent {
+    pub entity: Entity,
+}

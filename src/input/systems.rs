@@ -3,13 +3,17 @@ use bevy::window::PrimaryWindow;
 use bevy_renet::renet::RenetClient;
 
 use crate::{
+    animation::events::PlayAnimationEvent,
     client::resources::{ClientId, ClientLobby, CurrentClientId},
     deck::card::equipment::{components::Equipped, events::EquippedUse},
     enums::EntityState,
     input::resources::PlayerInput,
     networking::channels::ClientChannel,
     physics::components::Velocity,
-    player::{components::Player, events::PlayerCommand},
+    player::{
+        components::{Death, Player},
+        events::PlayerCommand,
+    },
     server::{
         events::{ClientSentCommandEvent, ClientSentInputEvent},
         resources::ServerLobby,
@@ -87,6 +91,17 @@ pub fn capture_player_command_input_system(
     }
 }
 
+// TODO: Probably needs some sort of throttilng to prevent spamming
+pub fn client_send_player_command_events(
+    mut client: ResMut<RenetClient>,
+    mut reader_player_command_event: EventReader<PlayerCommand>,
+) {
+    for player_command_event in reader_player_command_event.read() {
+        let player_command_message = bincode::serialize(&player_command_event).unwrap();
+        client.send_message(ClientChannel::Command, player_command_message);
+    }
+}
+
 // TODO: Rename possibly on_player_input
 pub fn server_receive_player_input_system(
     mut command: Commands,
@@ -125,8 +140,11 @@ pub fn server_receive_player_command_system(
     }
 }
 
-pub fn handle_input(mut query: Query<(&PlayerInput, &mut Velocity, &mut EntityState)>) {
-    for (player_input, mut vel, mut state) in &mut query {
+pub fn handle_input(
+    mut writer_play_animation: EventWriter<PlayAnimationEvent>,
+    mut query: Query<(&PlayerInput, &mut Velocity, &mut EntityState, Entity), Without<Death>>,
+) {
+    for (player_input, mut vel, mut state, entity) in &mut query {
         let mut fx = 0.0;
         let mut fy = 0.0;
 
@@ -147,8 +165,10 @@ pub fn handle_input(mut query: Query<(&PlayerInput, &mut Velocity, &mut EntitySt
 
         if force != Vec2::ZERO {
             *state = crate::enums::EntityState::Walk;
+            writer_play_animation.send(PlayAnimationEvent::new(entity, "Walk"));
         } else {
             *state = crate::enums::EntityState::Idle;
+            writer_play_animation.send(PlayAnimationEvent::new(entity, "Idle"));
         }
 
         vel.vector.x = force.x * *vel.current_speed;
