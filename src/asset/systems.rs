@@ -33,7 +33,7 @@ pub fn asset_loader_system(
         let asset_config: AssetsConfig =
             serde_json::from_str(&config_str.0).expect("Could not parse the asset config.");
 
-        let mut character_handles = HashMap::new();
+        let mut sprite_handles = HashMap::new();
 
         asset_config
             .sprites
@@ -50,7 +50,7 @@ pub fn asset_loader_system(
                     None,
                     None,
                 );
-                character_handles.insert(
+                sprite_handles.insert(
                     key.clone(),
                     (
                         texture_atlas,
@@ -61,7 +61,9 @@ pub fn asset_loader_system(
             });
 
         let asset_handler = AssetHandler {
-            textures: character_handles,
+            textures: sprite_handles,
+            cards: asset_config.cards.cards.clone(),
+            decks: asset_config.decks.decks.clone(),
         };
 
         commands.insert_resource(asset_handler);

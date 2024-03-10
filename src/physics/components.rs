@@ -1,4 +1,4 @@
-use crate::animation::components::Animated2DObjectBundle;
+use crate::animation::components::AnimatedBundle;
 use crate::body::components::Object2DBundle;
 use bevy::ecs::bundle::Bundle;
 use bevy::ecs::component::Component;
@@ -62,7 +62,7 @@ pub struct KineticBodyBundle {
 pub struct AnimatedKineticBodyBundle {
     pub velocity: Velocity,
 
-    pub animated_2d_object: Animated2DObjectBundle,
+    pub animated_2d_object: AnimatedBundle,
 
     pub collision_bundle: CollisionBundle,
 }

@@ -66,13 +66,14 @@ pub fn equipment_use_system(
                         };
                         let layer = equipped.equipment.projectile_layer;
 
-                        let event = SpawnProjectileEvent {
+                        let event: SpawnProjectileEvent = SpawnProjectileEvent {
                             translation: spawn_point.translation.into(),
                             velocity: velocity.vector.into(),
                             projectile_type: equipped.equipment.projectile_type.into(),
                             layer,
                             mask,
                         };
+
                         let message: Vec<u8> =
                             bincode::serialize(&ServerMessages::SpawnProjectile(event))
                                 .expect("Could not serialize spawn projectile message.");
@@ -95,7 +96,9 @@ pub fn equipment_use_system(
                             CollisionGroup { layer, mask },
                         );
 
-                        projectile.damage = Damage(equipped.equipment.damage as f32);
+                        projectile.damage = Damage {
+                            amount: equipped.equipment.damage as f32,
+                        };
 
                         command.spawn(projectile);
 

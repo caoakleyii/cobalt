@@ -1,13 +1,13 @@
 use bevy::{
     app::{App, Plugin, Update},
-    ecs::schedule::IntoSystemConfigs,
+    ecs::schedule::{common_conditions::in_state, IntoSystemConfigs},
 };
 
-use crate::networking::is_client;
+use crate::{enums::GameState, networking::is_client};
 
 use self::{
-    events::PlayAnimationEvent,
-    systems::{animate_sprites, play_animation},
+    events::{PlayAnimationEvent, SpawnSpriteEvent},
+    systems::{animate_sprites, play_animation, spawn_animation},
 };
 
 pub mod components;
@@ -23,6 +23,14 @@ impl Plugin for AnimationPlugin {
             (animate_sprites, play_animation).run_if(is_client()),
         );
 
+        app.add_systems(
+            Update,
+            (spawn_animation)
+                .run_if(is_client())
+                .run_if(in_state(GameState::Gameloop)),
+        );
+
         app.add_event::<PlayAnimationEvent>();
+        app.add_event::<SpawnSpriteEvent>();
     }
 }

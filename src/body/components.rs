@@ -1,7 +1,7 @@
 use bevy::prelude::{Bundle, Component, Transform};
 use bevy_2d_collisions::components::CollisionBundle;
 
-use crate::animation::components::Animated2DObjectBundle;
+use crate::animation::components::AnimatedBundle;
 
 /**
  * Object2D
@@ -58,7 +58,7 @@ pub struct StaticBodyBundle {
  */
 #[derive(Bundle, Default)]
 pub struct AnimatedStaticBodyBundle {
-    pub animated_2d_object: Animated2DObjectBundle,
+    pub animated_2d_object: AnimatedBundle,
 
     pub collision_bundle: CollisionBundle,
 }

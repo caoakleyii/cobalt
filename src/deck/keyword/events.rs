@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
  * an entity should be damaged, contains the corresponding
  * server message
  */
-#[derive(Event, Debug, Serialize, Deserialize)]
+#[derive(Event, Debug, Serialize, Deserialize, Clone)]
 pub struct DamageEntityEvent {
     pub entity: Entity,
     pub damage: f32,

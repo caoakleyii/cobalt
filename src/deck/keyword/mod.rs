@@ -1,16 +1,16 @@
 use bevy::prelude::*;
 
-use crate::{
-    enums::GameState,
-    networking::{is_client, is_server},
-};
+use crate::enums::GameState;
+use crate::networking::{is_client, is_server};
 
-use self::{
-    events::{DamageEntityEvent, SpawnProjectileEvent},
-    systems::{damage_collision, on_damage_entity, spawn_projectile},
+use self::events::{DamageEntityEvent, SpawnProjectileEvent};
+use self::systems::{
+    damage::{damage_collision, on_damage_entity},
+    projectile::spawn_projectile,
 };
 
 pub mod components;
+pub mod enums;
 pub mod events;
 mod systems;
 

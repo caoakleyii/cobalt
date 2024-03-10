@@ -1,10 +1,17 @@
 use bevy::prelude::*;
 
-use crate::{client::sets::Connected, enums::GameState, input::resources::PlayerInput};
+use crate::{
+    client::sets::ClientConnected,
+    enums::GameState,
+    input::resources::PlayerInput,
+    networking::{is_client, is_server},
+};
 
 use self::{
-    events::{CreatePlayerEvent, PlayerCommand, RemovePlayerEvent},
-    systems::{create_player, player_despawn},
+    events::{
+        CreatePlayerEvent, PlayerCommand, PlayerSpawnedEvent, RemovePlayerEvent, SpawnPlayerEvent,
+    },
+    systems::{create_player, create_player_server, player_despawn, spawn_player},
 };
 
 pub mod components;
@@ -19,10 +26,22 @@ impl Plugin for PlayerPlugin {
             Update,
             (create_player, player_despawn)
                 .run_if(in_state(GameState::Gameloop))
-                .in_set(Connected),
+                .run_if(is_client())
+                .in_set(ClientConnected),
         );
 
+        app.add_systems(
+            Update,
+            (create_player_server)
+                .run_if(in_state(GameState::Gameloop))
+                .run_if(is_server()),
+        );
+
+        app.add_systems(Update, spawn_player.run_if(in_state(GameState::Gameloop)));
+
         app.add_event::<CreatePlayerEvent>();
+        app.add_event::<SpawnPlayerEvent>();
+        app.add_event::<PlayerSpawnedEvent>();
         app.add_event::<RemovePlayerEvent>();
         app.add_event::<PlayerCommand>();
 

@@ -5,7 +5,10 @@ use bevy_renet::renet::RenetClient;
 use crate::{
     animation::events::PlayAnimationEvent,
     client::resources::{ClientId, ClientLobby, CurrentClientId},
-    deck::card::equipment::{components::Equipped, events::EquippedUse},
+    deck::{
+        card::equipment::{components::Equipped, events::EquippedUse},
+        events::DrawCardEvent,
+    },
     enums::EntityState,
     input::resources::PlayerInput,
     networking::channels::ClientChannel,
@@ -71,15 +74,16 @@ pub fn client_send_player_input_system(
 }
 
 pub fn capture_player_command_input_system(
+    mut writer_player_command_event: EventWriter<PlayerCommand>,
+    mut writer_draw_card_event: EventWriter<DrawCardEvent>,
     mouse_input: Res<Input<MouseButton>>,
     player_input: Res<PlayerInput>,
-    _keyboard_input: Res<Input<KeyCode>>,
-    player_query: Query<&Children, (With<Controllable>, With<Player>)>,
+    keyboard_input: Res<Input<KeyCode>>,
+    player_query: Query<(Entity, &Children), (With<Controllable>, With<Player>)>,
     equipment_query: Query<Entity, With<Equipped>>,
-    mut writer_player_command_event: EventWriter<PlayerCommand>,
 ) {
     if mouse_input.pressed(MouseButton::Left) {
-        if let Ok(children) = player_query.get_single() {
+        if let Ok((_, children)) = player_query.get_single() {
             for &child in children.iter() {
                 if let Ok(_equipment_entity) = equipment_query.get(child) {
                     writer_player_command_event.send(PlayerCommand::UseEquipment {
@@ -87,6 +91,12 @@ pub fn capture_player_command_input_system(
                     })
                 }
             }
+        }
+    }
+
+    if keyboard_input.pressed(KeyCode::R) {
+        if let Ok((entity, _)) = player_query.get_single() {
+            writer_draw_card_event.send(DrawCardEvent::new_to_max(entity));
         }
     }
 }

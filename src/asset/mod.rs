@@ -5,7 +5,7 @@ use bevy::{
     render::texture::Image,
 };
 
-use crate::{client::sets::Connected, enums::GameState};
+use crate::{client::sets::ClientConnected, enums::GameState};
 
 use self::{
     resources::{AssetLoading, TextAsset, TextLoader},
@@ -35,7 +35,7 @@ impl Plugin for AssetPlugin {
             Update,
             asset_loader_system
                 .run_if(in_state(GameState::Loading))
-                .in_set(Connected),
+                .in_set(ClientConnected),
         );
         app.add_systems(Update, asset_loader_state_system);
     }

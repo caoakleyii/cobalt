@@ -7,12 +7,17 @@ use bevy::{
     sprite::TextureAtlas,
     utils::BoxedFuture,
 };
+use bevy_2d_collisions::components::CollisionGroup;
 use serde::{Deserialize, Serialize};
 
-use crate::enums::CollisionGroups;
 use crate::{
     animation::components::AnimationName,
-    asset::enums::{Equipment, Sprites},
+    asset::enums::Sprites,
+    deck::{
+        card::{components::Card, enums::Cards},
+        enums::Decks,
+    },
+    enums::CollisionGroups,
 };
 
 #[derive(Resource, Default, Deref)]
@@ -20,19 +25,43 @@ pub struct AssetLoading(pub u32);
 
 #[derive(Resource, Default)]
 pub struct AssetHandler {
+    // TODO: Convert textures' value from a Tuple to Struct
+    // Perhaps create animation/component Sprite, and Animation
+    // impl Into for SpriteConfig and AnimationConfig
+    // <Sprites, Sprite>
     pub textures: HashMap<Sprites, (TextureAtlas, Vec<AnimationConfig>, Option<HitboxConfig>)>,
+
+    pub cards: HashMap<Cards, Card>,
+
+    pub decks: HashMap<Decks, Decklist>,
 }
 
 #[derive(Resource, Serialize, Deserialize)]
 pub struct AssetsConfig {
     pub sprites: SpritesConfig,
-    pub stats: StatsConfig,
+    pub cards: CardsConfig,
+    pub decks: DecksConfig,
 }
 
 // SPRITE CONFIG
 #[derive(Serialize, Deserialize)]
 pub struct SpritesConfig {
     pub textures: HashMap<Sprites, SpriteConfig>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CardsConfig {
+    pub cards: HashMap<Cards, Card>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DecksConfig {
+    pub decks: HashMap<Decks, Decklist>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Decklist {
+    pub cards: Vec<Cards>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -64,6 +93,26 @@ pub struct HitboxConfig {
     pub height: f32,
     pub x: f32,
     pub y: f32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CollisionGroupConfig {
+    pub layers: Vec<CollisionGroups>,
+    pub masks: Vec<CollisionGroups>,
+}
+
+impl Into<CollisionGroup> for CollisionGroupConfig {
+    fn into(self) -> CollisionGroup {
+        let mut layer = 0;
+        let mut mask = 0;
+        for group in self.layers {
+            layer |= group as u32;
+        }
+        for group in self.masks {
+            mask |= group as u32;
+        }
+        CollisionGroup { layer, mask }
+    }
 }
 
 // TEXT ASSET
@@ -104,28 +153,4 @@ impl AssetLoader for TextLoader {
     fn extensions(&self) -> &[&str] {
         &["json", "toml"]
     }
-}
-
-// STATS CONFIG
-#[derive(Serialize, Deserialize)]
-pub struct StatsConfig {
-    pub equipment: HashMap<Equipment, EquipmentStatsConfig>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct EquipmentStatsConfig {
-    pub name: Equipment,
-    pub magazine: u32,
-    pub max_magazine: u32,
-    pub fire_rate: f32,
-    pub reload_time: f32,
-    pub damage: u32,
-    pub spray: f32,
-    pub projectile_type: Sprites,
-    pub projectile_speed: f32,
-    pub projectile_size: f32,
-    pub projectile_per_shot: u32,
-    pub range: u32,
-    pub layers: Vec<CollisionGroups>,
-    pub masks: Vec<CollisionGroups>,
 }

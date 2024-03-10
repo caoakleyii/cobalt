@@ -9,11 +9,17 @@ use bevy_renet::{
     },
 };
 
-use self::resources::*;
+use self::{
+    resources::*,
+    systems::{handle_server_messages, replay_server_message},
+};
 use crate::{
-    client::sets::Connected,
+    client::sets::ClientConnected,
     enums::GameState,
-    networking::config::{connection_config, PROTOCOL_ID},
+    networking::{
+        config::{connection_config, PROTOCOL_ID},
+        networking::{ReplayedServerMessage, ServerMessage},
+    },
 };
 
 use self::systems::client_update_system;
@@ -30,8 +36,17 @@ impl Plugin for ClientPlugin {
 
         app.add_systems(
             Update,
-            client_update_system.run_if(in_state(GameState::Gameloop)),
+            (
+                client_update_system,
+                handle_server_messages,
+                replay_server_message,
+            )
+                .run_if(in_state(GameState::Gameloop)),
         );
+
+        app.init_resource::<ReplayMessageExpiry>();
+        app.add_event::<ServerMessage>();
+        app.add_event::<ReplayedServerMessage>();
     }
 }
 
@@ -58,7 +73,7 @@ impl ClientPlugin {
 
         let transport = NetcodeClientTransport::new(current_time, authentication, socket).unwrap();
 
-        app.configure_sets(Update, Connected.run_if(client_connected()));
+        app.configure_sets(Update, ClientConnected.run_if(client_connected()));
         app.insert_resource(client);
         app.insert_resource(transport);
 
@@ -73,6 +88,6 @@ impl ClientPlugin {
             }
         }
 
-        app.add_systems(Update, panic_on_error_system.in_set(Connected));
+        app.add_systems(Update, panic_on_error_system.in_set(ClientConnected));
     }
 }

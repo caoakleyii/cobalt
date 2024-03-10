@@ -1,15 +1,12 @@
 use bevy::{
     prelude::{Bundle, Component, Handle, Transform, Vec2, Vec3},
     sprite::{SpriteSheetBundle, TextureAtlas},
-    time::{Timer, TimerMode},
+    time::Timer,
 };
 
 use crate::{
-    animation::components::{Animated2DObjectBundle, Animator},
-    asset::{
-        enums::{Equipment as EquipmentType, Sprites},
-        resources::EquipmentStatsConfig,
-    },
+    animation::components::{AnimatedBundle, Animator},
+    asset::enums::{Equipment as EquipmentType, Sprites},
     math::{angle_between, vec2_from_vec3},
     physics::components::Velocity,
     stats::components::Speed,
@@ -20,7 +17,7 @@ use crate::{
 pub struct EquipmentBundle {
     pub equipped: Equipped,
 
-    pub animated_2d_object: Animated2DObjectBundle,
+    pub animated_2d_object: AnimatedBundle,
 }
 
 impl EquipmentBundle {
@@ -32,7 +29,7 @@ impl EquipmentBundle {
     ) -> Self {
         Self {
             equipped: Equipped { equipment },
-            animated_2d_object: Animated2DObjectBundle {
+            animated_2d_object: AnimatedBundle {
                 animator,
                 sprite_sheet_bundle: SpriteSheetBundle {
                     texture_atlas,
@@ -84,28 +81,28 @@ pub struct Equipment {
     pub reload_timer: Timer,
 }
 
-impl From<&EquipmentStatsConfig> for Equipment {
-    fn from(value: &EquipmentStatsConfig) -> Self {
-        Self {
-            equipment_type: value.name,
-            magazine: value.magazine,
-            max_magazine: value.max_magazine,
-            fire_rate: value.fire_rate,
-            reload_time: value.reload_time,
-            damage: value.damage,
-            spray: value.spray,
-            projectile_type: value.projectile_type,
-            range: value.range,
-            projectile_speed: value.projectile_speed,
-            projectile_size: value.projectile_size,
-            projectile_per_shot: value.projectile_per_shot,
-            projectile_layer: value.layers.iter().fold(0, |acc, x| acc | *x as u32),
-            projectile_mask: value.masks.iter().fold(0, |acc, x| acc | *x as u32),
-            fire_rate_timer: Timer::from_seconds(value.fire_rate, TimerMode::Once),
-            reload_timer: Timer::from_seconds(value.reload_time, TimerMode::Once),
-        }
-    }
-}
+// impl From<&EquipmentStatsConfig> for Equipment {
+//     fn from(value: &EquipmentStatsConfig) -> Self {
+//         Self {
+//             equipment_type: value.name,
+//             magazine: value.magazine,
+//             max_magazine: value.max_magazine,
+//             fire_rate: value.fire_rate,
+//             reload_time: value.reload_time,
+//             damage: value.damage,
+//             spray: value.spray,
+//             projectile_type: value.projectile_type,
+//             range: value.range,
+//             projectile_speed: value.projectile_speed,
+//             projectile_size: value.projectile_size,
+//             projectile_per_shot: value.projectile_per_shot,
+//             projectile_layer: value.layers.iter().fold(0, |acc, x| acc | *x as u32),
+//             projectile_mask: value.masks.iter().fold(0, |acc, x| acc | *x as u32),
+//             fire_rate_timer: Timer::from_seconds(value.fire_rate, TimerMode::Once),
+//             reload_timer: Timer::from_seconds(value.reload_time, TimerMode::Once),
+//         }
+//     }
+// }
 
 impl Equipment {
     pub fn use_equipment(&mut self, from: &Vec3, at: &Vec2) -> Velocity {

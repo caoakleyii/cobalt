@@ -1,5 +1,5 @@
-use bevy::app::App;
 use bevy::DefaultPlugins;
+use bevy::{app::App, winit::WinitSettings};
 use bevy_2d_collisions::CollisionsPlugin;
 use bevy_health_bar::ProgressBarPlugin;
 use bevy_renet::{transport::NetcodeClientPlugin, RenetClientPlugin};

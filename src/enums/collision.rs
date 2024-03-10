@@ -1,7 +1,7 @@
 use bevy::ecs::component::Component;
 use serde::{Deserialize, Serialize};
 
-#[derive(Component, Serialize, Deserialize, Default, Clone, Copy)]
+#[derive(Component, Serialize, Deserialize, Default, Clone, Copy, Debug)]
 pub enum CollisionGroups {
     Player = 1,
     Enemy = 2,
@@ -10,6 +10,7 @@ pub enum CollisionGroups {
     #[default]
     TeamAlpha = 16,
     TeamBravo = 32,
+    AOE = 64,
 }
 
 impl Into<u32> for CollisionGroups {
