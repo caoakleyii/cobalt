@@ -1,4 +1,4 @@
-use super::components::{Player, Team};
+use super::components::{LocalPlayer, Player, Team};
 use super::events::{PlayerSpawnedEvent, SpawnPlayerEvent};
 use crate::animation::events::SpawnSpriteEvent;
 use crate::asset::enums::Sprites;
@@ -236,6 +236,10 @@ pub fn spawn_player(
         let mut entity_commands = commands.get_or_spawn(spawn_player_event.entity);
 
         entity_commands.insert(player_bundle).insert(deck_bundle);
+
+        if spawn_player_event.local_player {
+            entity_commands.insert(LocalPlayer);
+        }
 
         writer_player_spawned.send(PlayerSpawnedEvent {
             entity: spawn_player_event.entity,

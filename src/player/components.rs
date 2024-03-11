@@ -41,6 +41,14 @@ pub struct Team(pub CollisionGroups);
 pub struct Death;
 
 /**
+ * Local Player
+ *
+ * Component stating that the player is the local player
+ */
+#[derive(Component, Debug, Default)]
+pub struct LocalPlayer;
+
+/**
  * Player Bundle
  *
  * Contains a player component, kinetic body bundle
