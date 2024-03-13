@@ -11,7 +11,9 @@ use self::{
     events::{
         CreatePlayerEvent, PlayerCommand, PlayerSpawnedEvent, RemovePlayerEvent, SpawnPlayerEvent,
     },
-    systems::{create_player, create_player_server, player_despawn, spawn_player},
+    systems::{
+        camera_follow_player, create_player, create_player_server, player_despawn, spawn_player,
+    },
 };
 
 pub mod components;
@@ -24,7 +26,7 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (create_player, player_despawn)
+            (create_player, player_despawn, camera_follow_player)
                 .run_if(in_state(GameState::Gameloop))
                 .run_if(is_client())
                 .in_set(ClientConnected),

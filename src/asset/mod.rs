@@ -3,6 +3,7 @@ use bevy::{
     asset::AssetApp,
     ecs::schedule::{common_conditions::in_state, IntoSystemConfigs},
     render::texture::Image,
+    text::Font,
 };
 
 use crate::{client::sets::ClientConnected, enums::GameState};
@@ -22,6 +23,7 @@ impl Plugin for AssetPlugin {
     fn build(&self, app: &mut App) {
         if cfg!(feature = "server") {
             app.init_asset::<Image>();
+            app.init_asset::<Font>();
         }
 
         app.init_asset::<TextAsset>();

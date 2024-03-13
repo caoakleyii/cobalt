@@ -7,6 +7,7 @@ use crate::enums::GameState;
 
 use self::systems::{draw_hud, health_bar_update, spawn_health_bar, spawn_hud};
 
+pub mod components;
 mod systems;
 
 pub struct UiPlugin;
@@ -15,7 +16,8 @@ impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (health_bar_update, spawn_health_bar, draw_hud).run_if(in_state(GameState::Gameloop)),
+            (health_bar_update, spawn_health_bar, spawn_hud, draw_hud)
+                .run_if(in_state(GameState::Gameloop)),
         );
     }
 }

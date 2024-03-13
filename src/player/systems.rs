@@ -11,7 +11,7 @@ use crate::deck::card::components::Card;
 use crate::deck::card::enums::Cards;
 use crate::deck::components::DeckBundle;
 use crate::enums::CollisionGroups;
-use crate::input::components::{Controllable, PlayerCamera};
+use crate::input::components::{Controllable, FollowCamera, PlayerCamera};
 use crate::networking::channels::ServerChannel;
 use crate::networking::networking::ServerMessages;
 use crate::player::components::PlayerBundle;
@@ -238,12 +238,23 @@ pub fn spawn_player(
         entity_commands.insert(player_bundle).insert(deck_bundle);
 
         if spawn_player_event.local_player {
-            entity_commands.insert(LocalPlayer);
+            entity_commands.insert((LocalPlayer, FollowCamera));
         }
 
         writer_player_spawned.send(PlayerSpawnedEvent {
             entity: spawn_player_event.entity,
             local_player: spawn_player_event.local_player,
         });
+    }
+}
+
+pub fn camera_follow_player(
+    players: Query<&Transform, With<FollowCamera>>,
+    mut query_camera: Query<&mut Transform, (With<PlayerCamera>, Without<FollowCamera>)>,
+) {
+    if let Ok(player) = players.get_single() {
+        if let Ok(mut camera_transform) = query_camera.get_single_mut() {
+            camera_transform.translation = player.translation;
+        }
     }
 }

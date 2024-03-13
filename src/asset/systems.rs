@@ -7,9 +7,10 @@ use bevy::{
     },
     render::texture::ImageSampler,
     sprite::TextureAtlas,
+    text::Font,
 };
 
-use super::resources::{AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset};
+use super::resources::{AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset, UiFont};
 use crate::enums::GameState;
 
 pub fn asset_config_loader_sytem(asset_server: Res<AssetServer>, mut commands: Commands) {
@@ -60,10 +61,13 @@ pub fn asset_loader_system(
                 );
             });
 
+        let font = asset_server.load("fonts/Roboto-Regular.ttf");
+
         let asset_handler = AssetHandler {
             textures: sprite_handles,
             cards: asset_config.cards.cards.clone(),
             decks: asset_config.decks.decks.clone(),
+            fonts: HashMap::from([("default".to_string(), UiFont::new(font))]),
         };
 
         commands.insert_resource(asset_handler);

@@ -5,6 +5,7 @@ use bevy::{
     prelude::{Asset, Deref, Handle, Resource},
     reflect::{TypePath, TypeUuid},
     sprite::TextureAtlas,
+    text::Font,
     utils::BoxedFuture,
 };
 use bevy_2d_collisions::components::CollisionGroup;
@@ -34,6 +35,8 @@ pub struct AssetHandler {
     pub cards: HashMap<Cards, Card>,
 
     pub decks: HashMap<Decks, Decklist>,
+
+    pub fonts: HashMap<String, UiFont>,
 }
 
 #[derive(Resource, Serialize, Deserialize)]
@@ -62,6 +65,17 @@ pub struct DecksConfig {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Decklist {
     pub cards: Vec<Cards>,
+}
+
+#[derive(Clone, Debug)]
+pub struct UiFont {
+    pub font: Handle<Font>,
+}
+
+impl UiFont {
+    pub fn new(handle: Handle<Font>) -> Self {
+        Self { font: handle }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]

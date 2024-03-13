@@ -12,18 +12,24 @@ use bevy::{
     render::{
         camera::{self, Camera, OrthographicProjection},
         color::Color,
+        view::Visibility,
     },
+    text::{Text, Text2dBundle, TextAlignment, TextStyle},
     transform::components::Transform,
+    ui::{self, node_bundles::TextBundle, Style, UiRect},
     window::{PrimaryWindow, Window},
 };
 use bevy_health_bar::{ProgressBar, ProgressBarBundle};
 
 use crate::{
+    asset::{self, resources::AssetHandler},
     deck::components::{Graveyard, Hand, Library},
     input::components::PlayerCamera,
     player::{components::LocalPlayer, events::PlayerSpawnedEvent},
     stats::components::Health,
 };
+
+use super::components::DrawHandPrompt;
 
 pub fn health_bar_update(
     query: Query<(&Health, &Children)>,
@@ -59,10 +65,11 @@ pub fn spawn_health_bar(
 
 pub fn spawn_hud(
     mut reader_player_spawned: EventReader<PlayerSpawnedEvent>,
+    mut commands: Commands,
     query_window: Query<&Window, With<PrimaryWindow>>,
-    mut gizmos: Gizmos,
+    query_camera: Query<&OrthographicProjection, With<PlayerCamera>>,
     hud_items: Query<(&Library, &Hand, &Graveyard)>,
-    asset_server: Res<AssetServer>,
+    asset_handler: Res<AssetHandler>,
 ) {
     for player_spawned_event in reader_player_spawned.read() {
         if !player_spawned_event.local_player {
@@ -71,9 +78,40 @@ pub fn spawn_hud(
 
         let player_entity = player_spawned_event.entity;
 
-        let (library, hand, graveyard) = hud_items
-            .get(player_entity)
-            .expect(format!("Player {:?} missing hud items.", player_entity).as_str());
+        let camera = query_camera.get_single().expect("No camera found.");
+
+        let card_size = Vec2::new(40.0, 60.0);
+
+        let bottom_padding = 40.0;
+
+        let ui_font = asset_handler
+            .fonts
+            .get("default")
+            .expect("default font has not be retrieved");
+
+        let text_style = TextStyle {
+            font: ui_font.font.clone(),
+            font_size: 15.0,
+            color: Color::WHITE,
+        };
+        let mut bundle = TextBundle::from_section("Press [F] to draw your hand", text_style)
+            .with_style(Style {
+                position_type: ui::PositionType::Relative,
+                justify_self: ui::JustifySelf::Center,
+                align_self: ui::AlignSelf::FlexEnd,
+                margin: UiRect {
+                    left: ui::Val::Px(0.0),
+                    right: ui::Val::Px(0.0),
+                    top: ui::Val::Px(0.0),
+                    bottom: ui::Val::Px(card_size.y / camera.scale + bottom_padding),
+                },
+                ..Default::default()
+            })
+            .with_text_alignment(TextAlignment::Center);
+
+        bundle.visibility = Visibility::Hidden;
+
+        commands.spawn((bundle, DrawHandPrompt));
     }
 }
 
@@ -81,6 +119,7 @@ pub fn draw_hud(
     hud_items: Query<(&Library, &Hand, &Graveyard), With<LocalPlayer>>,
     query_window: Query<&Window, With<PrimaryWindow>>,
     query_camera: Query<&OrthographicProjection, With<PlayerCamera>>,
+    mut query_draw_hand_prompt: Query<&mut Visibility, With<DrawHandPrompt>>,
     mut gizmos: Gizmos,
 ) {
     for (library, hand, graveyard) in &hud_items {
@@ -106,20 +145,31 @@ pub fn draw_hud(
 
         // Draw the hand
         let mut last_card_x = 0.0;
-        for i in 0..6 {
-            let position = Vec2::new(
-                window_width / 2.0
+        if let Ok(mut draw_hand_prompt) = query_draw_hand_prompt.get_single_mut() {
+            if hand.0.len() <= 0 {
+                *draw_hand_prompt = Visibility::Visible;
+            } else {
+                *draw_hand_prompt = Visibility::Hidden;
+
+                for i in 0..6 {
+                    let position = Vec2::new(
+                        window_width / 2.0
                     - ((card_size.x + 20.0) * 3.0) // spacing after the library
                     - ((card_size.x + 10.0) * i as f32), // spacing between cards
-                bottom_position,
-            );
-            last_card_x = position.x;
-            gizmos.rect_2d(position, 0.0, card_size.clone(), Color::WHITE);
+                        bottom_position,
+                    );
+                    last_card_x = position.x;
+                    gizmos.rect_2d(position, 0.0, card_size.clone(), Color::WHITE);
+                }
+            }
         }
 
         // Draw the graveyard spot
         gizmos.rect_2d(
-            Vec2::new(last_card_x - ((card_size.x + 20.0) * 2.0), bottom_position),
+            Vec2::new(
+                -(window_width / 2.0 - (card_size.x + 20.0)),
+                bottom_position,
+            ),
             0.0,
             card_size.clone(),
             Color::RED,
