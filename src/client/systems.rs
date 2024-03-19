@@ -114,7 +114,6 @@ pub fn handle_server_messages(
                 writer_damage_entity.send(damage_entity_event);
             }
             ServerMessages::Shuffle(shuffle_event) => {
-                println!("Received shuffle event: {:?}", shuffle_event.entity);
                 if let Some(entity) = network_mapping.0.get(&shuffle_event.entity) {
                     writer_shuffle_event.send(ShuffleEvent {
                         entity: *entity,

@@ -20,6 +20,15 @@ pub struct Graveyard(pub Vec<Card>);
 #[derive(Component, Debug, Default, Deref, DerefMut)]
 pub struct InPlay(pub Vec<Card>);
 
+#[derive(Component, Debug, Deref, DerefMut)]
+pub struct HandSize(pub usize);
+
+impl Default for HandSize {
+    fn default() -> Self {
+        Self(4)
+    }
+}
+
 #[derive(Bundle, Debug, Default)]
 pub struct DeckBundle {
     pub deck: Deck,
@@ -27,6 +36,7 @@ pub struct DeckBundle {
     pub hand: Hand,
     pub graveyard: Graveyard,
     pub in_play: InPlay,
+    pub hand_size: HandSize,
 }
 
 impl DeckBundle {

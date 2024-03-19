@@ -25,7 +25,8 @@ impl Plugin for InputPlugin {
                 capture_player_command_input_system,
                 client_send_player_input_system,
                 client_send_player_command_events,
-                handle_input,
+                handle_movement_input,
+                handle_deck_input,
             )
                 .run_if(in_state(GameState::Gameloop))
                 .run_if(is_client()),
@@ -35,8 +36,9 @@ impl Plugin for InputPlugin {
             Update,
             (
                 server_receive_player_input_system,
-                handle_input,
+                handle_movement_input,
                 server_receive_player_command_system,
+                handle_deck_input,
             )
                 .run_if(in_state(GameState::Gameloop))
                 .run_if(is_server()),

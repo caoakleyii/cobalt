@@ -7,6 +7,7 @@ use crate::{
     client::resources::{ClientId, ClientLobby, CurrentClientId},
     deck::{
         card::equipment::{components::Equipped, events::EquippedUse},
+        components::{Hand, HandSize, Library, Shuffled},
         events::DrawCardEvent,
     },
     enums::EntityState,
@@ -54,6 +55,8 @@ pub fn capture_player_input_system(
     player_input.down = keyboard_input.pressed(KeyCode::S);
     player_input.left = keyboard_input.pressed(KeyCode::A);
     player_input.right = keyboard_input.pressed(KeyCode::D);
+
+    player_input.draw = keyboard_input.pressed(KeyCode::F);
 
     if let Some(current_player_info) = lobby.players.get(&ClientId(client_id.0)) {
         command
@@ -150,7 +153,7 @@ pub fn server_receive_player_command_system(
     }
 }
 
-pub fn handle_input(
+pub fn handle_movement_input(
     mut writer_play_animation: EventWriter<PlayAnimationEvent>,
     mut query: Query<(&PlayerInput, &mut Velocity, &mut EntityState, Entity), Without<Death>>,
 ) {
@@ -183,5 +186,31 @@ pub fn handle_input(
 
         vel.vector.x = force.x * *vel.current_speed;
         vel.vector.y = force.y * *vel.current_speed;
+    }
+}
+
+pub fn handle_deck_input(
+    mut writer_draw_card_event: EventWriter<DrawCardEvent>,
+    query: Query<(&PlayerInput, &Hand, &HandSize, Entity), Without<Death>>,
+    is_shuffled: Query<&Library, With<Shuffled>>,
+) {
+    for (player_input, hand, hand_size, entity) in &mut query.iter() {
+        if player_input.draw {
+            if let Err(_) = is_shuffled.get(entity) {
+                continue;
+            }
+
+            if hand.0.len() > hand_size.0 {
+                continue;
+            }
+
+            let draw_card_event = if hand.0.len() <= 0 {
+                DrawCardEvent::new_to_max(entity)
+            } else {
+                DrawCardEvent::new(entity, 1)
+            };
+
+            writer_draw_card_event.send(draw_card_event);
+        }
     }
 }

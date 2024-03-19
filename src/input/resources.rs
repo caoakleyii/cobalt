@@ -7,5 +7,6 @@ pub struct PlayerInput {
     pub down: bool,
     pub left: bool,
     pub right: bool,
+    pub draw: bool,
     pub aim: Vec2,
 }

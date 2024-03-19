@@ -53,10 +53,6 @@ pub fn shuffle_deck(
 ) {
     for event in events.read() {
         if let Ok(mut library) = library_query.get_mut(event.entity) {
-            library.0.iter().for_each(|card| {
-                println!("Card: {:?}", card);
-            });
-
             println!("Shuffling deck for entity: {:?}", event.entity);
             let mut rng = SmallRng::seed_from_u64(event.seed);
             library.0.shuffle(&mut rng);

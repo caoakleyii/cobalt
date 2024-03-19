@@ -4,6 +4,7 @@ use crate::enums::GameState;
 use crate::networking::{is_client, is_server};
 
 use self::events::{DamageEntityEvent, SpawnProjectileEvent};
+use self::systems::draw::draw_card_to_hand;
 use self::systems::{
     damage::{damage_collision, on_damage_entity},
     projectile::spawn_projectile,
@@ -20,14 +21,14 @@ impl Plugin for KeywordPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (damage_collision)
+            (damage_collision, draw_card_to_hand)
                 .run_if(is_server())
                 .run_if(in_state(GameState::Gameloop)),
         );
 
         app.add_systems(
             Update,
-            (on_damage_entity, spawn_projectile)
+            (on_damage_entity, spawn_projectile, draw_card_to_hand)
                 .run_if(is_client())
                 .run_if(in_state(GameState::Gameloop)),
         );
