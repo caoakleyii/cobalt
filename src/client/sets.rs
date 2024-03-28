@@ -10,4 +10,4 @@ pub struct ClientConnected;
 
 /// A System Set that runs when a local player is created
 #[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct PlayerSet;
+pub struct PlayerSpawnSet;

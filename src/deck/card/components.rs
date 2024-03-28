@@ -1,10 +1,16 @@
-use bevy::ecs::component::Component;
+use bevy::ecs::{component::Component, entity::Entity};
 
 use serde::{Deserialize, Serialize};
 
 use crate::deck::keyword::enums::Keywords;
 
 use super::enums::{CardTypes, Cards, SubTypes};
+
+#[derive(Debug, Clone)]
+pub struct CardEntity {
+    pub entity: Entity,
+    pub card: Card,
+}
 
 #[derive(Serialize, Deserialize, Component, Debug, Clone)]
 pub struct Card {
@@ -13,6 +19,12 @@ pub struct Card {
     pub card_type: CardTypes,
     pub sub_type: Option<SubTypes>,
     pub keywords: Vec<Keywords>,
+}
+
+#[derive(Serialize, Deserialize, Component, Debug, Clone)]
+pub enum Flipped {
+    Up,
+    Down,
 }
 
 // TODO: Figure out how a player would cast a card

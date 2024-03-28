@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    client::sets::ClientConnected,
+    client::sets::{ClientConnected, PlayerSpawnSet},
     enums::GameState,
     input::resources::PlayerInput,
     networking::{is_client, is_server},
@@ -9,7 +9,7 @@ use crate::{
 
 use self::{
     events::{
-        CreatePlayerEvent, PlayerCommand, PlayerSpawnedEvent, RemovePlayerEvent, SpawnPlayerEvent,
+        CreatePlayerEvent, EntitySpawnedEvent, PlayerCommand, RemovePlayerEvent, SpawnPlayerEvent,
     },
     systems::{
         camera_follow_player, create_player, create_player_server, player_despawn, spawn_player,
@@ -18,7 +18,7 @@ use self::{
 
 pub mod components;
 pub mod events;
-mod systems;
+pub mod systems;
 
 pub struct PlayerPlugin;
 
@@ -39,11 +39,16 @@ impl Plugin for PlayerPlugin {
                 .run_if(is_server()),
         );
 
-        app.add_systems(Update, spawn_player.run_if(in_state(GameState::Gameloop)));
+        app.add_systems(
+            Update,
+            spawn_player
+                .run_if(in_state(GameState::Gameloop))
+                .in_set(PlayerSpawnSet),
+        );
 
         app.add_event::<CreatePlayerEvent>();
         app.add_event::<SpawnPlayerEvent>();
-        app.add_event::<PlayerSpawnedEvent>();
+        app.add_event::<EntitySpawnedEvent>();
         app.add_event::<RemovePlayerEvent>();
         app.add_event::<PlayerCommand>();
 

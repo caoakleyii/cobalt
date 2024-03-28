@@ -71,7 +71,7 @@ pub fn client_update_system(
                             // if local player is controlling
                             // we should only lerp the position, if it's very inaccurate
                             // and we don't need to update the aim.
-                            entity_command.insert((transform, state));
+                            entity_command.insert((state));
                         } else {
                             // TODO: Lerp transform
                             entity_command.insert((transform, state, aim));
@@ -114,12 +114,15 @@ pub fn handle_server_messages(
                 writer_damage_entity.send(damage_entity_event);
             }
             ServerMessages::Shuffle(shuffle_event) => {
-                if let Some(entity) = network_mapping.0.get(&shuffle_event.entity) {
+                println!("Shuffle received for entity {:?}", shuffle_event.player);
+                if let Some(entity) = network_mapping.0.get(&shuffle_event.player) {
+                    println!("Entity mapped correctly to {:?}", entity);
                     writer_shuffle_event.send(ShuffleEvent {
-                        entity: *entity,
+                        player: *entity,
                         seed: shuffle_event.seed,
                     });
                 } else {
+                    println!("Mapping miss, replaying  message");
                     writer_replayable_server_messages
                         .send(ReplayedServerMessage::new(server_message.clone()));
                 }

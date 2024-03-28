@@ -3,22 +3,22 @@ use bevy::{
     prelude::{Deref, DerefMut},
 };
 
-use super::card::components::Card;
+use super::card::components::CardEntity;
 
 #[derive(Component, Debug, Default, Deref, DerefMut)]
-pub struct Deck(pub Vec<Card>);
+pub struct Deck(pub Vec<CardEntity>);
 
 #[derive(Component, Debug, Default, Deref, DerefMut)]
-pub struct Library(pub Vec<Card>);
+pub struct Library(pub Vec<CardEntity>);
 
 #[derive(Component, Debug, Default, Deref, DerefMut)]
-pub struct Hand(pub Vec<Card>);
+pub struct Hand(pub Vec<CardEntity>);
 
 #[derive(Component, Debug, Default, Deref, DerefMut)]
-pub struct Graveyard(pub Vec<Card>);
+pub struct Graveyard(pub Vec<CardEntity>);
 
 #[derive(Component, Debug, Default, Deref, DerefMut)]
-pub struct InPlay(pub Vec<Card>);
+pub struct InPlay(pub Vec<CardEntity>);
 
 #[derive(Component, Debug, Deref, DerefMut)]
 pub struct HandSize(pub usize);
@@ -40,7 +40,7 @@ pub struct DeckBundle {
 }
 
 impl DeckBundle {
-    pub fn new(cards: Vec<Card>) -> Self {
+    pub fn new(cards: Vec<CardEntity>) -> Self {
         Self {
             deck: Deck(cards.clone()),
             library: Library(cards),

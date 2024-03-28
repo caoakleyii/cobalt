@@ -161,6 +161,44 @@
                         "interruptable_by": []
                     }
                 ]
+            },
+            "CardFront": {
+                "name": "CardFront",
+                "path": "cards/card_front.png",
+                "width": 64.0,
+                "height": 64.0,
+                "columns": 1,
+                "rows": 1,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 0,
+                        "end_index": 0,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
+                    }
+                ]
+            },
+            "CardBack": {
+                "name": "CardBack",
+                "path": "cards/card_back.png",
+                "width": 64.0,
+                "height": 64.0,
+                "columns": 1,
+                "rows": 1,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 0,
+                        "end_index": 0,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
+                    }
+                ]
             }
         }
     },

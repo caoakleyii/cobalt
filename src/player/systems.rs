@@ -1,5 +1,5 @@
 use super::components::{LocalPlayer, Player, Team};
-use super::events::{PlayerSpawnedEvent, SpawnPlayerEvent};
+use super::events::{EntitySpawnedEvent, SpawnPlayerEvent};
 use crate::animation::events::SpawnSpriteEvent;
 use crate::asset::enums::Sprites;
 use crate::asset::resources::AssetHandler;
@@ -7,7 +7,7 @@ use crate::asset::resources::AssetHandler;
 use crate::client::resources::{
     ClientId, ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo,
 };
-use crate::deck::card::components::Card;
+use crate::deck::card::components::{Card, CardEntity};
 use crate::deck::card::enums::Cards;
 use crate::deck::components::DeckBundle;
 use crate::enums::CollisionGroups;
@@ -179,18 +179,18 @@ pub fn create_player_server(
 pub fn spawn_player(
     mut commands: Commands,
     mut reader_spawn_player: EventReader<SpawnPlayerEvent>,
-    mut writer_player_spawned: EventWriter<PlayerSpawnedEvent>,
+    mut writer_entity_spawned: EventWriter<EntitySpawnedEvent>,
     asset_handler: Res<AssetHandler>,
 ) {
     for spawn_player_event in reader_spawn_player.read() {
         let character_type = Sprites::Skeleton;
 
-        let (_texture, _animations, hitbox_config) = asset_handler
+        let texture = asset_handler
             .textures
             .get(&character_type)
             .expect("unexpected character requested.");
 
-        let hitbox_config = hitbox_config.expect(&format!(
+        let hitbox_config = texture.hitbox.expect(&format!(
             "Requested character does not have a hitbox: {:?}",
             character_type
         ));
@@ -221,14 +221,17 @@ pub fn spawn_player(
             Cards::Metal,
         ];
 
-        let cards: Vec<Card> = default_deck
+        let cards: Vec<CardEntity> = default_deck
             .iter()
             .map(|card| {
-                asset_handler
+                let card = asset_handler
                     .cards
                     .get(card)
                     .expect("unexpected card requested")
-                    .clone()
+                    .clone();
+                let entity = commands.spawn(card.clone()).id();
+
+                CardEntity { entity, card }
             })
             .collect();
 
@@ -237,13 +240,17 @@ pub fn spawn_player(
 
         entity_commands.insert(player_bundle).insert(deck_bundle);
 
+        println!(
+            "Player spawned: {:?} with deck bundle",
+            spawn_player_event.entity
+        );
+
         if spawn_player_event.local_player {
             entity_commands.insert((LocalPlayer, FollowCamera));
         }
 
-        writer_player_spawned.send(PlayerSpawnedEvent {
+        writer_entity_spawned.send(EntitySpawnedEvent {
             entity: spawn_player_event.entity,
-            local_player: spawn_player_event.local_player,
         });
     }
 }

@@ -30,7 +30,7 @@ pub struct AssetHandler {
     // Perhaps create animation/component Sprite, and Animation
     // impl Into for SpriteConfig and AnimationConfig
     // <Sprites, Sprite>
-    pub textures: HashMap<Sprites, (TextureAtlas, Vec<AnimationConfig>, Option<HitboxConfig>)>,
+    pub textures: HashMap<Sprites, Texture>,
 
     pub cards: HashMap<Cards, Card>,
 
@@ -65,6 +65,13 @@ pub struct DecksConfig {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Decklist {
     pub cards: Vec<Cards>,
+}
+
+#[derive(Clone, Debug)]
+pub struct Texture {
+    pub texture_atlas: TextureAtlas,
+    pub animations: Vec<AnimationConfig>,
+    pub hitbox: Option<HitboxConfig>,
 }
 
 #[derive(Clone, Debug)]

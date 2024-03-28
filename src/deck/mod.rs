@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{enums::GameState, networking::is_server};
+use crate::{enums::GameState, networking::is_server, player::systems::spawn_player};
 
 use self::{
     card::CardPlugin,
@@ -20,7 +20,10 @@ pub struct DeckPlugin;
 
 impl Plugin for DeckPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (shuffle_deck).run_if(in_state(GameState::Gameloop)));
+        app.add_systems(
+            Update,
+            (shuffle_deck.before(spawn_player)).run_if(in_state(GameState::Gameloop)),
+        );
         app.add_systems(Update, (player_spawned_spawn_deck).run_if(is_server()));
         app.add_plugins((CardPlugin, KeywordPlugin));
         app.add_event::<DrawCardEvent>();

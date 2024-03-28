@@ -9,7 +9,7 @@ use bevy_renet::renet::RenetServer;
 use crate::{
     deck::components::Shuffled,
     networking::{channels::ServerChannel, networking::ServerMessages},
-    player::events::PlayerSpawnedEvent,
+    player::events::EntitySpawnedEvent,
 };
 
 use super::{components::Library, events::ShuffleEvent};
@@ -20,7 +20,7 @@ use rand::{rngs::SmallRng, seq::SliceRandom};
 // player_spawned_write_to_shuffle
 // sends rng seed
 pub fn player_spawned_spawn_deck(
-    mut reader_player_spawned: EventReader<PlayerSpawnedEvent>,
+    mut reader_player_spawned: EventReader<EntitySpawnedEvent>,
     mut writer_shuffle: EventWriter<ShuffleEvent>,
     mut server: ResMut<RenetServer>,
 ) {
@@ -30,7 +30,7 @@ pub fn player_spawned_spawn_deck(
             .expect("Time went backwards")
             .as_secs();
         let shuffle_event = ShuffleEvent {
-            entity: player.entity,
+            player: player.entity,
             seed,
         };
 
@@ -52,12 +52,12 @@ pub fn shuffle_deck(
     mut commands: Commands,
 ) {
     for event in events.read() {
-        if let Ok(mut library) = library_query.get_mut(event.entity) {
-            println!("Shuffling deck for entity: {:?}", event.entity);
+        if let Ok(mut library) = library_query.get_mut(event.player) {
+            println!("Shuffling deck for entity: {:?}", event.player);
             let mut rng = SmallRng::seed_from_u64(event.seed);
             library.0.shuffle(&mut rng);
 
-            commands.entity(event.entity).insert(Shuffled);
+            commands.entity(event.player).insert(Shuffled);
         }
     }
 }

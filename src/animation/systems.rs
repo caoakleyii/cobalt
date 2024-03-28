@@ -36,7 +36,7 @@ pub fn spawn_animation(
     for spawn_sprite_event in reader_spawn_animation.read() {
         let sprite = spawn_sprite_event.sprite;
 
-        let (texture, animation, _hitbox_config) = asset_handler
+        let texture = asset_handler
             .textures
             .get(&sprite)
             .expect("unexpected sprite requested.");
@@ -48,8 +48,8 @@ pub fn spawn_animation(
         };
 
         let mut animation_bundle = AnimatedBundle::new(
-            Animator::import(animation),
-            texture_atlases.add(texture.clone()),
+            Animator::import(&texture.animations),
+            texture_atlases.add(texture.texture_atlas.clone()),
         );
 
         if let Some(translation) = spawn_sprite_event.translation {

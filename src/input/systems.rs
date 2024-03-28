@@ -56,7 +56,7 @@ pub fn capture_player_input_system(
     player_input.left = keyboard_input.pressed(KeyCode::A);
     player_input.right = keyboard_input.pressed(KeyCode::D);
 
-    player_input.draw = keyboard_input.pressed(KeyCode::F);
+    player_input.draw = keyboard_input.pressed(KeyCode::R);
 
     if let Some(current_player_info) = lobby.players.get(&ClientId(client_id.0)) {
         command
@@ -94,12 +94,6 @@ pub fn capture_player_command_input_system(
                     })
                 }
             }
-        }
-    }
-
-    if keyboard_input.pressed(KeyCode::R) {
-        if let Ok((entity, _)) = player_query.get_single() {
-            writer_draw_card_event.send(DrawCardEvent::new_to_max(entity));
         }
     }
 }
@@ -200,7 +194,7 @@ pub fn handle_deck_input(
                 continue;
             }
 
-            if hand.0.len() > hand_size.0 {
+            if hand.0.len() >= hand_size.0 {
                 continue;
             }
 

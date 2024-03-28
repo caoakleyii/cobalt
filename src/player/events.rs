@@ -37,9 +37,8 @@ pub struct SpawnPlayerEvent {
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Clone)]
-pub struct PlayerSpawnedEvent {
+pub struct EntitySpawnedEvent {
     pub entity: Entity,
-    pub local_player: bool,
 }
 
 /**

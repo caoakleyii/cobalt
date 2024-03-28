@@ -27,7 +27,7 @@ pub fn spawn_projectile(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     for spawn_projectile in reader_spawn_projectile.read() {
-        let (texture, animations, hitbox_config) = asset_handler
+        let texture = asset_handler
             .textures
             .get(&spawn_projectile.projectile_type.into())
             .expect("Could not find projectile texture in asset handler.");
@@ -35,11 +35,13 @@ pub fn spawn_projectile(
         let mut transform = Transform::from_translation(spawn_projectile.translation.into());
         transform.rotation = Quat::from_rotation_z(velocity.rotation);
 
-        let hitbox_config = hitbox_config.expect("Could not find hitbox config for bullet.");
+        let hitbox_config = texture
+            .hitbox
+            .expect("Could not find hitbox config for bullet.");
 
         let mut projectile = ProjectileBundle::new(
-            Animator::import(animations),
-            texture_atlases.add(texture.clone()),
+            Animator::import(&texture.animations),
+            texture_atlases.add(texture.texture_atlas.clone()),
             transform,
             velocity,
             Vec2::new(hitbox_config.width, hitbox_config.height),

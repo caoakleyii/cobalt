@@ -10,7 +10,9 @@ use bevy::{
     text::Font,
 };
 
-use super::resources::{AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset, UiFont};
+use super::resources::{
+    AssetConfigTextHandler, AssetHandler, AssetsConfig, TextAsset, Texture, UiFont,
+};
 use crate::enums::GameState;
 
 pub fn asset_config_loader_sytem(asset_server: Res<AssetServer>, mut commands: Commands) {
@@ -53,11 +55,11 @@ pub fn asset_loader_system(
                 );
                 sprite_handles.insert(
                     key.clone(),
-                    (
+                    Texture {
                         texture_atlas,
-                        sprite_config.animations.clone(),
-                        sprite_config.hitbox,
-                    ),
+                        animations: sprite_config.animations.clone(),
+                        hitbox: sprite_config.hitbox,
+                    },
                 );
             });
 
