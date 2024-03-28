@@ -6,29 +6,22 @@ use bevy::{
         query::{With, Without},
         system::{Commands, Res},
     },
-    gizmos::gizmos::Gizmos,
     hierarchy::BuildChildren,
     math::{Vec2, Vec3},
     prelude::{Children, Query},
-    render::{
-        camera::{self, Camera, OrthographicProjection},
-        color::Color,
-        view::Visibility,
-    },
-    text::{Text, Text2dBundle, TextAlignment, TextStyle},
+    render::{camera::OrthographicProjection, color::Color, view::Visibility},
+    text::{TextAlignment, TextStyle},
     transform::components::Transform,
     ui::{
         self,
         node_bundles::{ImageBundle, NodeBundle, TextBundle},
-        widget::UiImageSize,
         *,
     },
-    window::{PrimaryWindow, Window},
 };
 use bevy_health_bar::{ProgressBar, ProgressBarBundle};
 
 use crate::{
-    asset::{self, enums::Sprites, resources::AssetHandler},
+    asset::{enums::Sprites, resources::AssetHandler},
     deck::{
         card::components::Flipped,
         components::{Graveyard, Hand, Library},
@@ -76,7 +69,6 @@ pub fn spawn_health_bar(
 pub fn spawn_hud(
     mut reader_entity_spawned: EventReader<EntitySpawnedEvent>,
     mut commands: Commands,
-    query_window: Query<&Window, With<PrimaryWindow>>,
     query_camera: Query<&OrthographicProjection, With<PlayerCamera>>,
     is_local_player: Query<With<LocalPlayer>>,
     hud_items: Query<(&Library, &Hand, &Graveyard)>,
@@ -109,7 +101,7 @@ pub fn spawn_hud(
             .get(&Sprites::CardFront)
             .expect("Card front image not found.");
 
-        let (library, hand, graveyard) = hud_items
+        let (library, _hand, _graveyard) = hud_items
             .get(player_entity)
             .expect(format!("No hud items found for {:?}", player_entity).as_str());
 
@@ -250,7 +242,7 @@ pub fn spawn_hud(
             ..Default::default()
         };
 
-        let graveyard_ui_entity = commands.spawn(graveyard_ui).id();
+        let _graveyard_ui_entity = commands.spawn(graveyard_ui).id();
     }
 }
 

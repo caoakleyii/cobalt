@@ -78,10 +78,8 @@ pub fn client_send_player_input_system(
 
 pub fn capture_player_command_input_system(
     mut writer_player_command_event: EventWriter<PlayerCommand>,
-    mut writer_draw_card_event: EventWriter<DrawCardEvent>,
     mouse_input: Res<Input<MouseButton>>,
     player_input: Res<PlayerInput>,
-    keyboard_input: Res<Input<KeyCode>>,
     player_query: Query<(Entity, &Children), (With<Controllable>, With<Player>)>,
     equipment_query: Query<Entity, With<Equipped>>,
 ) {

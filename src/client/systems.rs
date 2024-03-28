@@ -71,7 +71,7 @@ pub fn client_update_system(
                             // if local player is controlling
                             // we should only lerp the position, if it's very inaccurate
                             // and we don't need to update the aim.
-                            entity_command.insert((state));
+                            entity_command.insert(state);
                         } else {
                             // TODO: Lerp transform
                             entity_command.insert((transform, state, aim));

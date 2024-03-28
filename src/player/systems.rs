@@ -7,7 +7,7 @@ use crate::asset::resources::AssetHandler;
 use crate::client::resources::{
     ClientId, ClientLobby, CurrentClientId, NetworkEntities, PlayerInfo,
 };
-use crate::deck::card::components::{Card, CardEntity};
+use crate::deck::card::components::CardEntity;
 use crate::deck::card::enums::Cards;
 use crate::deck::components::DeckBundle;
 use crate::enums::CollisionGroups;

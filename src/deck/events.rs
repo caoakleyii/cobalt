@@ -1,7 +1,7 @@
 use bevy::ecs::{entity::Entity, event::Event};
 use serde::{Deserialize, Serialize};
 
-use super::card::components::{Card, CardEntity};
+use super::card::components::CardEntity;
 
 #[derive(Debug, Clone, Event, Serialize, Deserialize)]
 pub struct ShuffleEvent {

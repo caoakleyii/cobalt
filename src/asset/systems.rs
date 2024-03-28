@@ -7,7 +7,6 @@ use bevy::{
     },
     render::texture::ImageSampler,
     sprite::TextureAtlas,
-    text::Font,
 };
 
 use super::resources::{
