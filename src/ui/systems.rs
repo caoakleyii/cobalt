@@ -22,6 +22,7 @@ use bevy_health_bar::{ProgressBar, ProgressBarBundle};
 
 use crate::{
     asset::{enums::Sprites, resources::AssetHandler},
+    combat::components::{Health, HealthBar},
     deck::{
         card::components::Flipped,
         components::{Graveyard, Hand, Library},
@@ -29,14 +30,13 @@ use crate::{
     },
     input::components::PlayerCamera,
     player::{components::LocalPlayer, events::EntitySpawnedEvent},
-    stats::components::Health,
 };
 
 use super::components::{CardBack, CardFront, CardText, CardUI, DrawHandPrompt, HandUI, LibraryUI};
 
 pub fn health_bar_update(
     query: Query<(&Health, &Children)>,
-    mut bar_query: Query<&mut ProgressBar>,
+    mut bar_query: Query<&mut ProgressBar, With<HealthBar>>,
 ) {
     for (health, children) in query.iter() {
         for &child in children.iter() {
@@ -62,6 +62,7 @@ pub fn spawn_health_bar(
                 ProgressBarBundle::new(100.0, asset_server.load("ui/health_bar.png"))
                     .with_transform(transform),
             )
+            .insert(HealthBar)
             .set_parent(player_entity);
     }
 }

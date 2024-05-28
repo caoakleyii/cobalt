@@ -5,10 +5,12 @@ use bevy_renet::renet::RenetClient;
 use crate::{
     animation::events::PlayAnimationEvent,
     client::resources::{ClientId, ClientLobby, CurrentClientId},
+    combat::components::{Casting, CastingBundle},
     deck::{
         card::equipment::{components::Equipped, events::EquippedUse},
         components::{Hand, HandSize, Library, Shuffled},
         events::DrawCardEvent,
+        keyword::components::Draw,
     },
     enums::EntityState,
     input::resources::PlayerInput,
@@ -182,13 +184,20 @@ pub fn handle_movement_input(
 }
 
 pub fn handle_deck_input(
-    mut writer_draw_card_event: EventWriter<DrawCardEvent>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
     query: Query<(&PlayerInput, &Hand, &HandSize, Entity), Without<Death>>,
     is_shuffled: Query<&Library, With<Shuffled>>,
+    is_casting: Query<&Player, With<Casting>>,
 ) {
-    for (player_input, hand, hand_size, entity) in &mut query.iter() {
+    for (player_input, hand, hand_size, player_entity) in &mut query.iter() {
+        if let Ok(_) = is_casting.get(player_entity) {
+            continue;
+        }
+
         if player_input.draw {
-            if let Err(_) = is_shuffled.get(entity) {
+            println!("Drawing");
+            if let Err(_) = is_shuffled.get(player_entity) {
                 continue;
             }
 
@@ -196,13 +205,22 @@ pub fn handle_deck_input(
                 continue;
             }
 
-            let draw_card_event = if hand.0.len() <= 0 {
-                DrawCardEvent::new_to_max(entity)
-            } else {
-                DrawCardEvent::new(entity, 1)
-            };
+            let draw_card = commands
+                .spawn(Draw { amount: 1 })
+                .set_parent(player_entity)
+                .id();
+            let castable = commands
+                .spawn(CastingBundle::new(
+                    0.3,
+                    asset_server.load("ui/cast_bar.png"),
+                    draw_card,
+                ))
+                .set_parent(player_entity)
+                .id();
 
-            writer_draw_card_event.send(draw_card_event);
+            if let Some(mut entity) = commands.get_entity(player_entity) {
+                entity.insert(Casting(castable));
+            }
         }
     }
 }

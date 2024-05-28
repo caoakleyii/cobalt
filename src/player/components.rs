@@ -3,9 +3,9 @@ use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGro
 use bevy_renet::renet::ClientId;
 
 use crate::{
-    body::components::Object2DBundle, enums::CollisionGroups, input::components::Aim,
-    networking::components::NetworkedEntityBundle, physics::components::KineticBodyBundle,
-    stats::components::Health,
+    body::components::Object2DBundle, combat::components::Health, enums::CollisionGroups,
+    input::components::Aim, networking::components::NetworkedEntityBundle,
+    physics::components::KineticBodyBundle,
 };
 
 /**

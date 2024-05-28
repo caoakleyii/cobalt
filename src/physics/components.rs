@@ -5,7 +5,7 @@ use bevy::ecs::component::Component;
 use bevy::math::Vec2;
 use bevy_2d_collisions::components::CollisionBundle;
 
-use crate::stats::components::Speed;
+use crate::combat::components::Speed;
 
 /**
  * Velocity

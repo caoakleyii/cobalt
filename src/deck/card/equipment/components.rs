@@ -9,7 +9,7 @@ use crate::{
     asset::enums::{Equipment as EquipmentType, Sprites},
     math::{angle_between, vec2_from_vec3},
     physics::components::Velocity,
-    stats::components::Speed,
+    combat::components::Speed,
 };
 
 // BUNDLE NEEDED for equipment and animation etc.

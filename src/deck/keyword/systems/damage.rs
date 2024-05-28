@@ -7,12 +7,12 @@ use bevy_renet::renet::RenetServer;
 
 use crate::{
     client::resources::NetworkEntities,
+    combat::components::Health,
     deck::keyword::{components::Damage, events::DamageEntityEvent},
     enums::EntityState,
     networking::{channels::ServerChannel, networking::ServerMessages},
     player::components::Death,
     server::events::SyncEntityEvent,
-    stats::components::Health,
 };
 
 pub fn damage_collision(
