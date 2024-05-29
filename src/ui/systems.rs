@@ -255,7 +255,6 @@ pub fn card_drawn(
 ) {
     for card_drawn_event in reader_card_drawn.read() {
         if let Ok(hand_ui_entity) = hand_ui_query.get_single() {
-            println!("Draw card");
             if let Some(mut entity_command) = commands.get_entity(card_drawn_event.card.entity) {
                 entity_command.set_parent(hand_ui_entity);
                 entity_command.insert(Flipped::Up);

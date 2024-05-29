@@ -5,6 +5,7 @@ use crate::networking::{is_client, is_server};
 use crate::player::systems::spawn_player;
 
 use self::events::{DamageEntityEvent, SpawnProjectileEvent};
+use self::systems::draw::draw_card;
 use self::systems::{
     damage::{damage_collision, on_damage_entity},
     projectile::spawn_projectile,
@@ -34,6 +35,13 @@ impl Plugin for KeywordPlugin {
             (on_damage_entity, spawn_projectile)
                 .before(spawn_player)
                 .run_if(is_client())
+                .run_if(in_state(GameState::Gameloop)),
+        );
+
+        app.add_systems(
+            Update,
+            (draw_card)
+                .before(spawn_player)
                 .run_if(in_state(GameState::Gameloop)),
         );
 

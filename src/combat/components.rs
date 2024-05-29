@@ -1,17 +1,13 @@
 use bevy::{
     asset::Handle,
-    ecs::{
-        bundle::{self, Bundle},
-        component::Component,
-        entity::Entity,
-    },
+    ecs::{bundle::Bundle, component::Component, entity::Entity},
     math::Vec3,
     prelude::{Deref, DerefMut},
     render::texture::Image,
     time::Timer,
-    transform::{self, components::Transform},
+    transform::components::Transform,
 };
-use bevy_health_bar::{ProgressBar, ProgressBarBundle};
+use bevy_health_bar::ProgressBarBundle;
 
 /**
  * Speed
@@ -77,7 +73,7 @@ impl CastingBundle {
             progress_bar: ProgressBarBundle::new(cast_time, cast_bar_image)
                 .with_transform(transform),
             castable: Castable {
-                entity: castable_entity,
+                casted_entity: castable_entity,
             },
             cast_bar: CastBar,
         }
@@ -91,7 +87,7 @@ pub struct CastTime {
 
 #[derive(Component, Clone, Copy, Debug)]
 pub struct Castable {
-    pub entity: Entity,
+    pub casted_entity: Entity,
 }
 
 #[derive(Component, Clone, Copy, Debug)]

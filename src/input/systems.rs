@@ -9,7 +9,6 @@ use crate::{
     deck::{
         card::equipment::{components::Equipped, events::EquippedUse},
         components::{Hand, HandSize, Library, Shuffled},
-        events::DrawCardEvent,
         keyword::components::Draw,
     },
     enums::EntityState,
@@ -196,7 +195,6 @@ pub fn handle_deck_input(
         }
 
         if player_input.draw {
-            println!("Drawing");
             if let Err(_) = is_shuffled.get(player_entity) {
                 continue;
             }
@@ -205,10 +203,8 @@ pub fn handle_deck_input(
                 continue;
             }
 
-            let draw_card = commands
-                .spawn(Draw { amount: 1 })
-                .set_parent(player_entity)
-                .id();
+            let draw_card = commands.spawn(Draw { amount: 1 }).id();
+
             let castable = commands
                 .spawn(CastingBundle::new(
                     0.3,
@@ -216,6 +212,7 @@ pub fn handle_deck_input(
                     draw_card,
                 ))
                 .set_parent(player_entity)
+                .add_child(draw_card)
                 .id();
 
             if let Some(mut entity) = commands.get_entity(player_entity) {

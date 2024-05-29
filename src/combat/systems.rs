@@ -29,14 +29,13 @@ pub fn tick_cast_timers(
         progress_bar.value = cast_time.timer.remaining_secs();
 
         if cast_time.timer.just_finished() {
-            if let Some(mut casted_entity_commands) = commands.get_entity(castable.entity) {
+            if let Some(mut casted_entity_commands) = commands.get_entity(castable.casted_entity) {
                 casted_entity_commands.insert(Casted {
                     casted_by: caster_entity.get(),
                 });
             }
 
             if let Some(mut caster_entity_commands) = commands.get_entity(caster_entity.get()) {
-                println!("Remove Casting");
                 caster_entity_commands.remove::<Casting>();
             }
 
