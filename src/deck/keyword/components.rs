@@ -6,9 +6,12 @@ use bevy::{
 use bevy_2d_collisions::components::{CollisionBox, CollisionBundle, CollisionGroup};
 use serde::{Deserialize, Serialize};
 
-use crate::animation::components::{AnimatedBundle, Animator};
 use crate::body::components::Object2DBundle;
 use crate::physics::components::{AnimatedKineticBodyBundle, KineticBodyBundle, Velocity};
+use crate::{
+    animation::components::{AnimatedBundle, Animator},
+    deck::card::enums::ResourceTypes,
+};
 
 use super::enums::ProjectileType;
 
@@ -40,6 +43,14 @@ pub struct Draw {
 }
 
 #[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]
+pub struct Cast {
+    pub cast: u32,
+    pub max_cast: u32,
+    pub cast_time: f32,
+    pub recovery_time: f32,
+}
+
+#[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct Gun {
     pub magazine: u32,
     pub max_magazine: u32,
@@ -47,6 +58,13 @@ pub struct Gun {
     pub reload_time: f32,
     pub spray: f32,
     pub projectiles_per_shot: u32,
+}
+
+#[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]
+pub struct Resource {
+    pub pool: u32,
+    pub max_pool: u32,
+    pub resource_type: ResourceTypes,
 }
 
 #[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, Default)]

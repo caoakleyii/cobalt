@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::deck::keyword::enums::Keywords;
 
-use super::enums::{CardTypes, Cards, SubTypes};
+use super::enums::{CardTypes, Cards, ResourceTypes, SubTypes};
 
 #[derive(Debug, Clone)]
 pub struct CardEntity {
@@ -15,6 +15,7 @@ pub struct CardEntity {
 #[derive(Serialize, Deserialize, Component, Debug, Clone)]
 pub struct Card {
     pub name: Cards,
+    pub resource_types: Vec<ResourceTypes>,
     pub resource_cost: u32,
     pub card_type: CardTypes,
     pub sub_type: Option<SubTypes>,

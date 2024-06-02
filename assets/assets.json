@@ -204,21 +204,19 @@
     },
     "cards": {
         "cards": {
-            "AK47": {
-                "name": "AK47",
-                "resource_cost": 2,
-                "card_type": "Weapon",
-                "subtype": "Rifle",
+            "Fireball": {
+                "name": "Fireball",
+                "resource_cost": 10,
+                "resource_types": ["Red"],
+                "card_type": "Spell", 
                 "keywords": [
                     {
-                        "type": "Gun",
+                        "type": "Cast",
                         "component": {
-                            "magazine": 27,
-                            "max_magazine": 27,
-                            "fire_rate": 0.2,
-                            "reload_time": 1.0,
-                            "spray": 0.3,
-                            "projectiles_per_shot": 1
+                            "cast": 5,
+                            "max_cast": 5,
+                            "cast_time": 0.2,
+                            "recovery_time": 0.1
                         }
                     },
                     {
@@ -241,159 +239,39 @@
                     }
                 ]
             },
-            "MP5": {
-                "name": "MP5",
-                "resource_cost": 2,
-                "card_type": "Weapon",
-                "subtype": "SMG",
-                "keywords": [
-                    {
-                        "type": "Gun",
-                        "component": {
-                            "magazine": 21,
-                            "max_magazine": 21,
-                            "fire_rate": 0.1,
-                            "reload_time": 0.6,
-                            "spray": 0.5,
-                            "projectiles_per_shot": 1
-                        }
-                    },
-                    {
-                        "type": "Projectile",
-                        "component": {
-                            "projectile_type": "SmgBullet",
-                            "speed": 10.0,
-                            "range": 500.0
-                        },
-                        "collision": {
-                            "layers": ["Projectile"],
-                            "masks": ["Enemy"]
-                        }
-                    },
-                    {
-                        "type": "Damage",
-                        "component": {
-                            "amount": 2
-                        }
-                    }
-                ]
-            },
-            "M1216": {
-                "name": "M1216",
-                "resource_cost": 2,
-                "card_type": "Weapon",
-                "subtype": "Shotgun",
-                "keywords": [
-                    {
-                        "type": "Gun",
-                        "component": {
-                            "magazine": 8,
-                            "max_magazine": 8,
-                            "fire_rate": 0.5,
-                            "reload_time": 1.0,
-                            "spray": 0.8,
-                            "projectiles_per_shot": 5
-                        }
-                    },
-                    {
-                        "type": "Projectile",
-                        "component": {
-                            "projectile_type": "ShotgunBullet",
-                            "speed": 10.0,
-                            "range": 500.0
-                        },
-                        "collision": {
-                            "layers": ["Projectile"],
-                            "masks": ["Enemy"]
-                        }
-                    },
-                    {
-                        "type": "Damage",
-                        "component": {
-                            "amount": 10
-                        }
-                    }
-                ]
-            },
-            "EMP": {
-                "name": "EMP",
-                "resource_cost": 2,
-                "card_type": "Utility",
-                "subtype": "Disruption",
-                "keywords": [
-                    {
-                        "type": "AOE",
-                        "component": {
-                            "radius": 100.0
-                        },
-                        "collision": {
-                            "layers": ["AOE"],
-                            "masks": ["Enemy"]
-                        }
-                    },
-                    {
-                        "type": "Discard",
-                        "component": {
-                            "amount": 3
-                        }
-                    },
-                    {
-                        "type": "Shuffle",
-                        "component": {}
-                    }
-                ]
-            },
-            "FragGrenade": {
-                "name": "FragGrenade",
-                "resource_cost": 1,
-                "card_type": "Utility",
-                "subtype": "Offensive",
-                "keywords": [
-                    {
-                        "type": "AOE",
-                        "component": {
-                            "radius": 100.0
-                        },
-                        "collision": {
-                            "layers": ["AOE"],
-                            "masks": ["Enemy"]
-                        }
-                    },
-                    {
-                        "type": "Damage",
-                        "component": {
-                            "amount": 10
-                        }
-                    },
-                    {
-                        "type": "Throw",
-                        "component": {
-                            "range": 700.0,
-                            "speed": 10.0
-                        }
-                    }
-                ]
-            },
-            "SupplyDrop": {
-                "name": "SupplyDrop",
-                "resource_cost": 1,
-                "card_type": "Utility",
-                "subtype": "Tactical",
-                "keywords": [
-                    {
-                        "type": "Draw",
-                        "component": {
-                            "amount": 2
-                        }
-                    }
-                ]
-            },
-            "Metal": {
-                "name": "Metal",
+            "CrudeAmber": {
+                "name": "CrudeAmber",
                 "resource_cost": 0,
-                "card_type": "Material",
+                "resource_types": [],
+                "card_type": "Mana",
                 "subtype": "Metal",
-                "keywords": []
+                "keywords": [
+                    {
+                        "type": "Resource",
+                        "component": {
+                            "pool": 10,
+                            "max_pool": 10,
+                            "resource_type": "Red"
+                        }
+                    }
+                ]
+            },
+            "Amber": {
+                "name": "Amber",
+                "resource_cost": 0,
+                "resource_types": [],
+                "card_type": "Mana",
+                "subtype": "Metal",
+                "keywords": [
+                    {
+                        "type": "Resource",
+                        "component": {
+                            "pool": 20,
+                            "max_pool": 20,
+                            "resource_type": "Red"
+                        }
+                    }
+                ]
             }
         }
     },
@@ -401,14 +279,9 @@
         "decks": {
             "Default": {
                 "cards": [
-                    "AK47",
-                    "AK47",
-                    "AK47",
-                    "FragGrenade",
-                    "FragGrenade",
-                    "SupplyDrop",
-                    "Metal",
-                    "Metal"
+                    "Fireball",
+                    "CrudeAmber",
+                    "Amber"
                 ]
             }
         }

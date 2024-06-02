@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::asset::resources::CollisionGroupConfig;
 
-use super::components::{Damage, Discard, Draw, Gun, Projectile, Shuffle, Throw, AOE};
+use super::components::{Cast, Damage, Discard, Draw, Projectile, Resource, Shuffle, Throw, AOE};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "type")]
@@ -22,8 +22,11 @@ pub enum Keywords {
     Draw {
         component: Draw,
     },
-    Gun {
-        component: Gun,
+    Cast {
+        component: Cast,
+    },
+    Resource {
+        component: Resource,
     },
     Projectile {
         component: Projectile,

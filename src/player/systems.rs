@@ -210,16 +210,7 @@ pub fn spawn_player(
             Team(spawn_player_event.team.into()),
         );
 
-        let default_deck = vec![
-            Cards::AK47,
-            Cards::AK47,
-            Cards::AK47,
-            Cards::FragGrenade,
-            Cards::FragGrenade,
-            Cards::SupplyDrop,
-            Cards::Metal,
-            Cards::Metal,
-        ];
+        let default_deck = vec![Cards::Fireball, Cards::Amber, Cards::CrudeAmber];
 
         let cards: Vec<CardEntity> = default_deck
             .iter()

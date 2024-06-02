@@ -195,14 +195,21 @@ pub fn handle_deck_input(
         }
 
         if player_input.draw {
-            if let Err(_) = is_shuffled.get(player_entity) {
-                continue;
-            }
+            match is_shuffled.get(player_entity) {
+                Ok(library) => {
+                    if library.0.len() <= 0 {
+                        // Have the player cast a shuffle graveyard into deck
+                        continue;
+                    }
+                }
+                Err(_) => continue,
+            };
 
             if hand.0.len() >= hand_size.0 {
                 continue;
             }
 
+            // Change this possible to
             let draw_card = commands.spawn(Draw { amount: 1 }).id();
 
             let castable = commands

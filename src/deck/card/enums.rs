@@ -8,25 +8,17 @@ use serde::{Deserialize, Serialize};
     Component, Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, EnumFilter,
 )]
 pub enum Cards {
-    AK47,
-    MP5,
-    M1216,
-    EMP,
-    FragGrenade,
-    SupplyDrop,
-    Metal,
+    Fireball,
+    CrudeAmber,
+    Amber,
 }
 
 impl Display for Cards {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Cards::AK47 => write!(f, "AK47"),
-            Cards::MP5 => write!(f, "MP5"),
-            Cards::M1216 => write!(f, "M1216"),
-            Cards::EMP => write!(f, "EMP"),
-            Cards::FragGrenade => write!(f, "Frag Grenade"),
-            Cards::SupplyDrop => write!(f, "Supply Drop"),
-            Cards::Metal => write!(f, "Metal"),
+            Cards::Fireball => write!(f, "Fireball"),
+            Cards::CrudeAmber => write!(f, "Crude Amber"),
+            Cards::Amber => write!(f, "Amber"),
         }
     }
 }
@@ -35,20 +27,29 @@ impl Display for Cards {
     Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, Component, EnumFilter,
 )]
 pub enum CardTypes {
-    Weapon,
-    Utility,
-    Material,
+    Spell,
+    Mana,
 }
 
 #[derive(
     Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, Component, EnumFilter,
 )]
 pub enum SubTypes {
-    Rifle,
-    SMG,
-    Shotgun,
+    Sorcery,
     Disruption,
-    Offensive,
-    Tactical,
-    Metal,
+
+    // MANA
+    Red,
+    Blue,
+    Yellow,
+}
+
+#[derive(
+    Debug, Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Copy, Component, EnumFilter, Default,
+)]
+pub enum ResourceTypes {
+    #[default]
+    Red,
+    Blue,
+    Yellow,
 }
