@@ -5,7 +5,12 @@ use bevy_renet::renet::RenetClient;
 use crate::{
     animation::events::PlayAnimationEvent,
     client::resources::{ClientId, ClientLobby, CurrentClientId},
-    deck::card::equipment::{components::Equipped, events::EquippedUse},
+    combat::components::{Casting, CastingBundle},
+    deck::{
+        card::equipment::{components::Equipped, events::EquippedUse},
+        components::{Hand, HandSize, Library, Shuffled},
+        keyword::components::Draw,
+    },
     enums::EntityState,
     input::resources::PlayerInput,
     networking::channels::ClientChannel,
@@ -52,6 +57,8 @@ pub fn capture_player_input_system(
     player_input.left = keyboard_input.pressed(KeyCode::A);
     player_input.right = keyboard_input.pressed(KeyCode::D);
 
+    player_input.draw = keyboard_input.pressed(KeyCode::R);
+
     if let Some(current_player_info) = lobby.players.get(&ClientId(client_id.0)) {
         command
             .entity(current_player_info.client_entity)
@@ -71,15 +78,14 @@ pub fn client_send_player_input_system(
 }
 
 pub fn capture_player_command_input_system(
+    mut writer_player_command_event: EventWriter<PlayerCommand>,
     mouse_input: Res<Input<MouseButton>>,
     player_input: Res<PlayerInput>,
-    _keyboard_input: Res<Input<KeyCode>>,
-    player_query: Query<&Children, (With<Controllable>, With<Player>)>,
+    player_query: Query<(Entity, &Children), (With<Controllable>, With<Player>)>,
     equipment_query: Query<Entity, With<Equipped>>,
-    mut writer_player_command_event: EventWriter<PlayerCommand>,
 ) {
     if mouse_input.pressed(MouseButton::Left) {
-        if let Ok(children) = player_query.get_single() {
+        if let Ok((_, children)) = player_query.get_single() {
             for &child in children.iter() {
                 if let Ok(_equipment_entity) = equipment_query.get(child) {
                     writer_player_command_event.send(PlayerCommand::UseEquipment {
@@ -140,7 +146,7 @@ pub fn server_receive_player_command_system(
     }
 }
 
-pub fn handle_input(
+pub fn handle_movement_input(
     mut writer_play_animation: EventWriter<PlayAnimationEvent>,
     mut query: Query<(&PlayerInput, &mut Velocity, &mut EntityState, Entity), Without<Death>>,
 ) {
@@ -173,5 +179,52 @@ pub fn handle_input(
 
         vel.vector.x = force.x * *vel.current_speed;
         vel.vector.y = force.y * *vel.current_speed;
+    }
+}
+
+pub fn handle_deck_input(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    query: Query<(&PlayerInput, &Hand, &HandSize, Entity), Without<Death>>,
+    is_shuffled: Query<&Library, With<Shuffled>>,
+    is_casting: Query<&Player, With<Casting>>,
+) {
+    for (player_input, hand, hand_size, player_entity) in &mut query.iter() {
+        if let Ok(_) = is_casting.get(player_entity) {
+            continue;
+        }
+
+        if player_input.draw {
+            match is_shuffled.get(player_entity) {
+                Ok(library) => {
+                    if library.0.len() <= 0 {
+                        // Have the player cast a shuffle graveyard into deck
+                        continue;
+                    }
+                }
+                Err(_) => continue,
+            };
+
+            if hand.0.len() >= hand_size.0 {
+                continue;
+            }
+
+            // Change this possible to
+            let draw_card = commands.spawn(Draw { amount: 1 }).id();
+
+            let castable = commands
+                .spawn(CastingBundle::new(
+                    0.3,
+                    asset_server.load("ui/cast_bar.png"),
+                    draw_card,
+                ))
+                .set_parent(player_entity)
+                .add_child(draw_card)
+                .id();
+
+            if let Some(mut entity) = commands.get_entity(player_entity) {
+                entity.insert(Casting(castable));
+            }
+        }
     }
 }

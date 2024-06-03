@@ -16,6 +16,9 @@ pub struct Controllable;
 #[derive(Component, Default)]
 pub struct PlayerCamera;
 
+#[derive(Component, Default)]
+pub struct FollowCamera;
+
 /**
  * Aim
  *

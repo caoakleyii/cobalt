@@ -66,18 +66,19 @@ pub fn equipment_use_system(
                         };
                         let layer = equipped.equipment.projectile_layer;
 
-                        let event = SpawnProjectileEvent {
+                        let event: SpawnProjectileEvent = SpawnProjectileEvent {
                             translation: spawn_point.translation.into(),
                             velocity: velocity.vector.into(),
                             projectile_type: equipped.equipment.projectile_type.into(),
                             layer,
                             mask,
                         };
+
                         let message: Vec<u8> =
                             bincode::serialize(&ServerMessages::SpawnProjectile(event))
                                 .expect("Could not serialize spawn projectile message.");
 
-                        let (_texture, _animations, hitbox_config) = asset_handler
+                        let texture = asset_handler
                             .textures
                             .get(&event.projectile_type.into())
                             .expect("Could not find projectile texture in asset handler.");
@@ -85,8 +86,9 @@ pub fn equipment_use_system(
                         let mut transform = Transform::from_translation(spawn_point.translation);
                         transform.rotation = Quat::from_rotation_z(velocity.rotation);
 
-                        let hitbox_config =
-                            hitbox_config.expect("Could not find hitbox config for bullet.");
+                        let hitbox_config = texture
+                            .hitbox
+                            .expect("Could not find hitbox config for bullet.");
 
                         let mut projectile = ServerProjectileBundle::new(
                             transform,
@@ -95,7 +97,9 @@ pub fn equipment_use_system(
                             CollisionGroup { layer, mask },
                         );
 
-                        projectile.damage = Damage(equipped.equipment.damage as f32);
+                        projectile.damage = Damage {
+                            amount: equipped.equipment.damage as f32,
+                        };
 
                         command.spawn(projectile);
 

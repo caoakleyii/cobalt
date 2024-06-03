@@ -161,61 +161,129 @@
                         "interruptable_by": []
                     }
                 ]
+            },
+            "CardFront": {
+                "name": "CardFront",
+                "path": "cards/card_front.png",
+                "width": 64.0,
+                "height": 64.0,
+                "columns": 1,
+                "rows": 1,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 0,
+                        "end_index": 0,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
+                    }
+                ]
+            },
+            "CardBack": {
+                "name": "CardBack",
+                "path": "cards/card_back.png",
+                "width": 64.0,
+                "height": 64.0,
+                "columns": 1,
+                "rows": 1,
+                "animations": [
+                    {
+                        "name": "Idle",
+                        "start_index": 0,
+                        "end_index": 0,
+                        "should_loop": true,
+                        "is_default": true,
+                        "frame_speed": 0.1,
+                        "interruptable_by": []
+                    }
+                ]
             }
         }
     },
-    "stats": {
-        "equipment": {
-            "AK47": {
-                "name": "AK47",
-                "magazine": 27,
-                "max_magazine": 27,
-                "fire_rate": 0.2,
-                "reload_time": 1.0,
-                "damage": 10,
-                "spray": 0.3,
-                "projectile_type": "Bullet",
-                "projectile_speed": 900.0,
-                "projectile_size": 900.0,
-                "projectile_per_shot": 1,
-                "range": 1000,
-                "layers": ["Projectile"],
-                "masks": ["Enemy"]
+    "cards": {
+        "cards": {
+            "Fireball": {
+                "name": "Fireball",
+                "resource_cost": 10,
+                "resource_types": ["Red"],
+                "card_type": "Spell", 
+                "keywords": [
+                    {
+                        "type": "Cast",
+                        "component": {
+                            "cast": 5,
+                            "max_cast": 5,
+                            "cast_time": 0.2,
+                            "recovery_time": 0.1
+                        }
+                    },
+                    {
+                        "type": "Projectile",
+                        "component": {
+                            "projectile_type": "Bullet",
+                            "speed": 10.0,
+                            "range": 1000.0
+                        },
+                        "collision": {
+                            "layers": ["Projectile"],
+                            "masks": ["Enemy"]
+                        }
+                    },
+                    {
+                        "type": "Damage",
+                        "component": {
+                            "amount": 10
+                        }
+                    }
+                ]
             },
-            "Smg": {
-                "name": "Smg",
-                "magazine": 21,
-                "max_magazine": 21,
-                "fire_rate": 0.1,
-                "reload_time": 0.6,
-                "damage": 2,
-                "spray": 0.5,
-                "projectile_type": "SmgBullet",
-                "projectile_speed": 10.0,
-                "projectile_size": 1.0,
-                "projectile_per_shot": 1,
-                "range": 500,
-                "layers": ["Projectile"],
-                "masks": ["Enemy"]
+            "CrudeAmber": {
+                "name": "CrudeAmber",
+                "resource_cost": 0,
+                "resource_types": [],
+                "card_type": "Mana",
+                "subtype": "Metal",
+                "keywords": [
+                    {
+                        "type": "Resource",
+                        "component": {
+                            "pool": 10,
+                            "max_pool": 10,
+                            "resource_type": "Red"
+                        }
+                    }
+                ]
             },
-            "Shotgun":{
-                "name": "Shotgun",
-                "magazine": 8,
-                "max_magazine": 8,
-                "fire_rate": 0.5,
-                "reload_time": 1.0,
-                "damage": 10,
-                "spray": 0.8,
-                "projectile_type": "ShotgunBullet",
-                "projectile_speed": 10.0,
-                "projectile_size": 1.0,
-                "projectile_per_shot": 5,
-                "range": 500,
-                "layers": ["Projectile"],
-                "masks": ["Enemy"]
+            "Amber": {
+                "name": "Amber",
+                "resource_cost": 0,
+                "resource_types": [],
+                "card_type": "Mana",
+                "subtype": "Metal",
+                "keywords": [
+                    {
+                        "type": "Resource",
+                        "component": {
+                            "pool": 20,
+                            "max_pool": 20,
+                            "resource_type": "Red"
+                        }
+                    }
+                ]
             }
-    
+        }
+    },
+    "decks": {
+        "decks": {
+            "Default": {
+                "cards": [
+                    "Fireball",
+                    "CrudeAmber",
+                    "Amber"
+                ]
+            }
         }
     }
-    
 }

@@ -19,12 +19,26 @@ pub enum PlayerCommand {
  * a player should be created, contains the corresponding
  * server message
 */
-#[derive(Event, Debug, Serialize, Deserialize)]
+#[derive(Event, Debug, Serialize, Deserialize, Clone)]
 pub struct CreatePlayerEvent {
     pub entity: Entity,
     pub id: ClientId,
     pub translation: [f32; 3],
     pub team: u32,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Clone)]
+pub struct SpawnPlayerEvent {
+    pub entity: Entity,
+    pub id: ClientId,
+    pub translation: [f32; 3],
+    pub team: u32,
+    pub local_player: bool,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Clone)]
+pub struct EntitySpawnedEvent {
+    pub entity: Entity,
 }
 
 /**
@@ -33,7 +47,7 @@ pub struct CreatePlayerEvent {
  * a player should be removed, contains the corresponding
  * server message
  */
-#[derive(Event, Debug, Serialize, Deserialize)]
+#[derive(Event, Debug, Serialize, Deserialize, Clone)]
 pub struct RemovePlayerEvent {
     pub id: ClientId,
 }

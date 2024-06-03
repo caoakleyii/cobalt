@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_2d_collisions::components::CollisionGroup;
+
 use bevy_renet::renet::{
     RenetServer,
     ServerEvent::{self, ClientConnected, ClientDisconnected},
@@ -7,12 +7,10 @@ use bevy_renet::renet::{
 
 use crate::{
     asset::{
-        enums::{Equipment, Sprites},
         resources::{AssetHandler, AssetsConfig},
     },
     client::resources::ClientId,
-    deck::card::equipment::components::ServerEquipmentBundle,
-    enums::{CollisionGroups, EntityState},
+    enums::{EntityState},
     input::resources::PlayerInput,
     networking::{
         channels::{ClientChannel, ServerChannel},
@@ -21,7 +19,7 @@ use crate::{
         networking::ServerMessages,
     },
     player::{
-        components::{Player, ServerPlayerBundle, Team},
+        components::{Player, Team},
         events::{CreatePlayerEvent, PlayerCommand, RemovePlayerEvent},
     },
     server::{
@@ -113,90 +111,24 @@ pub fn on_demand_server_network_sync(
 
 // TODO: Simplify the connect and write to a "client_connected" event; then a seperate system to handle the player create event within Player Plugin
 pub fn client_connected_to_server(
-    mut commands: Commands,
+    _commands: Commands,
+    mut writer_create_player: EventWriter<CreatePlayerEvent>,
     mut reader_client_connected: EventReader<ClientConnectedEvent>,
-    mut lobby: ResMut<ServerLobby>,
-    mut server: ResMut<RenetServer>,
-    asset_handler: Res<AssetHandler>,
-    asset_config: Res<AssetsConfig>,
-    players: Query<(Entity, &Player, &Transform, &Team)>,
+    _lobby: ResMut<ServerLobby>,
+    _server: ResMut<RenetServer>,
+    _asset_handler: Res<AssetHandler>,
+    _asset_config: Res<AssetsConfig>,
+    _players: Query<(Entity, &Player, &Transform, &Team)>,
 ) {
     for client_connected in reader_client_connected.read() {
         match client_connected.0 {
             ClientConnected { client_id } => {
-                println!("Player {} connected.", client_id);
-
-                // initialize the newly connected client with the current state of the players in the game
-                for (entity, player, transform, p_team) in &players {
-                    let translation: [f32; 3] = transform.translation.into();
-                    let message =
-                        bincode::serialize(&ServerMessages::PlayerCreate(CreatePlayerEvent {
-                            id: ClientId(player.id.raw()),
-                            entity,
-                            translation,
-                            team: (**p_team).into(),
-                        }))
-                        .unwrap();
-                    server.send_message(client_id, ServerChannel::ServerMessages, message);
-                }
-
-                // spawn the player on the server
-
-                let character_type = Sprites::Skeleton;
-                // Retrieve character assets from the already loaded resources
-                let (_texture, _animations, hitbox_config) = asset_handler
-                    .textures
-                    .get(&character_type)
-                    .expect("unexpected character requested.");
-
-                let hitbox_config = hitbox_config.expect(&format!(
-                    "Requested character does not have a hitbox: {:?}",
-                    character_type
-                ));
-
-                // TODO: Change this, curently just auto balancing teams
-                let team = if lobby.players.len() % 2 == 0 {
-                    CollisionGroups::TeamAlpha as u32
-                } else {
-                    CollisionGroups::TeamBravo as u32
-                };
-
-                let spawn_point = Vec3::new(0.0, 0.0, 0.0);
-                let player_entity = commands
-                    .spawn(ServerPlayerBundle::new(
-                        client_id,
-                        Transform::from_translation(spawn_point.clone()),
-                        Vec2::new(hitbox_config.width, hitbox_config.height),
-                        CollisionGroup {
-                            layer: CollisionGroups::Player as u32 | team,
-                            mask: 0,
-                        },
-                        Team(team.into()),
-                    ))
-                    .with_children(|parent| {
-                        parent.spawn(ServerEquipmentBundle::new(
-                            asset_config
-                                .stats
-                                .equipment
-                                .get(&Equipment::AK47)
-                                .expect("Could not find AK47 in equipment config.")
-                                .into(),
-                        ));
-                    })
-                    .id();
-
-                lobby.players.insert(client_id.raw(), player_entity);
-
-                // send the player entity to the clients
-                let message =
-                    bincode::serialize(&ServerMessages::PlayerCreate(CreatePlayerEvent {
-                        id: ClientId(client_id.raw()),
-                        entity: player_entity,
-                        translation: spawn_point.to_array(),
-                        team,
-                    }))
-                    .unwrap();
-                server.broadcast_message(ServerChannel::ServerMessages, message);
+                writer_create_player.send(CreatePlayerEvent {
+                    entity: Entity::from_raw(0),
+                    id: ClientId(client_id.raw()),
+                    translation: [0.0, 0.0, 0.0],
+                    team: 0,
+                });
             }
             _ => {}
         }

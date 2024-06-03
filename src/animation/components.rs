@@ -2,8 +2,9 @@ use core::fmt;
 use std::collections::HashMap;
 
 use bevy::{
-    prelude::{Bundle, Component, Deref, DerefMut},
-    sprite::{SpriteSheetBundle, TextureAtlasSprite},
+    asset::Handle,
+    prelude::{Bundle, Component, Deref, DerefMut, Transform},
+    sprite::{SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
     time::{
         Timer,
         TimerMode::{self, Repeating},
@@ -12,7 +13,7 @@ use bevy::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    asset::resources::AnimationConfig, body::components::Object2D,
+    asset::resources::AnimationConfig,
     enums::state::EgocentricDirection,
 };
 
@@ -51,14 +52,35 @@ pub struct Direction(pub EgocentricDirection);
  * Base bundle for any animated objects in the world
  */
 #[derive(Clone, Bundle, Default)]
-pub struct Animated2DObjectBundle {
+pub struct AnimatedBundle {
     pub sprite_sheet_bundle: SpriteSheetBundle,
-
-    pub object_2d: Object2D,
 
     pub direction: Direction,
 
     pub animator: Animator,
+}
+
+impl AnimatedBundle {
+    pub fn new(animator: Animator, texture_atlas: Handle<TextureAtlas>) -> Self {
+        Self {
+            sprite_sheet_bundle: SpriteSheetBundle {
+                texture_atlas,
+                ..Default::default()
+            },
+            animator,
+            ..Default::default()
+        }
+    }
+
+    pub fn with_direction(&mut self, direction: EgocentricDirection) -> &Self {
+        self.direction.0 = direction;
+        self
+    }
+
+    pub fn with_transform(&mut self, transform: Transform) -> &Self {
+        self.sprite_sheet_bundle.transform = transform;
+        self
+    }
 }
 
 #[derive(Clone, Component, Default)]

@@ -12,6 +12,8 @@ pub enum Sprites {
     SmgBullet,
     ShotgunBullet,
     AK47,
+    CardFront,
+    CardBack,
 }
 
 impl Into<u8> for Sprites {
@@ -28,6 +30,8 @@ impl From<u8> for Sprites {
             2 => Self::SmgBullet,
             3 => Self::ShotgunBullet,
             4 => Self::AK47,
+            5 => Self::CardFront,
+            6 => Self::CardBack,
             _ => panic!("Invalid sprite type"),
         }
     }

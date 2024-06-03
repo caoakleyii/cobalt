@@ -6,4 +6,8 @@ use bevy::ecs::schedule::SystemSet;
 /// bevy_renet::transport::client_connected()
 /// bevy_renet::steam::client_disconnected(
 #[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Connected;
+pub struct ClientConnected;
+
+/// A System Set that runs when a local player is created
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct PlayerSpawnSet;
